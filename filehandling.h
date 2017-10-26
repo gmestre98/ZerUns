@@ -3,8 +3,8 @@
 #include "Macros.h"
 
 
-FILE *OpenFile ( char *filename, char *mode );
-int ReadValue (FILE *fp);
-void ReadData(char *filename, PuzzleNode *head);
-PuzzleNode *CreateNode();
+FILE* OpenFile ( char *filename, char *mode );
+void GetPuzzle(FILE *fp, PuzzleNode *puzzle);
+PuzzleNode* CreateNode(PuzzleNode *head);
+PuzzleNode* ReadData(char *filename);
 

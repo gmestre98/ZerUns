@@ -6,7 +6,7 @@
 /******************************************************************************
  * OpenFile()
  *
- * Arguments: nome - pointer to string holding name of file to open
+ * Arguments: filename - pointer to string holding name of file to open
  *            mode - pointer to string holding mode to use for opening file
  * Returns: pointer to opened file
  * Side-Effects: exits if given file that cannot be opened with given mode
@@ -14,8 +14,7 @@
  * Description:
  *
  *****************************************************************************/
-
-FILE *OpenFile ( char *filename, char *mode )
+FILE* OpenFile ( char *filename, char *mode )
 {
   FILE *f;
   f = fopen ( filename, mode );
@@ -26,7 +25,19 @@ FILE *OpenFile ( char *filename, char *mode )
   return (f);
 }
 
-void ReadPuzzle(FILE *fp, PuzzleNode *puzzle)
+/******************************************************************************
+ * GetPuzzle()
+ *
+ * Arguments: fp - pointer to opened file
+ *            puzzle - pointer to node which contains the struct that holds the puzzle info
+ * Returns: nothing
+ * Side-Effects: All the 0's read in the file matrix are changed into -1's in the node matrix.
+ * If given invalid inputs, the program exits
+ *
+ * Description:
+ *
+ *****************************************************************************/
+void GetPuzzle(FILE *fp, PuzzleNode *puzzle)
 {
 	int l, c;
 
@@ -54,10 +65,20 @@ void ReadPuzzle(FILE *fp, PuzzleNode *puzzle)
   				matrix[l][c]=-1;
   		}
   	}
+  	return;
 }
 
-
-PuzzleNode *CreateNode(head);
+/******************************************************************************
+ * CreateNode()
+ *
+ * Arguments: head - pointer to the first node
+ * Returns: pointer to new node
+ * Side-Effects: Allocs mem to another node and inserts it into the bottom of the list.
+ *
+ * Description:
+ *
+ *****************************************************************************/
+PuzzleNode* CreateNode(PuzzleNode *head);
 {
 	PuzzleNode *newnode, *aux;
 	newnode= (PuzzleNode*) malloc(sizeof(Puzzle));
@@ -69,7 +90,6 @@ PuzzleNode *CreateNode(head);
 	newnode->binary=0;
 	newnode->matrix=NULL;
 	newnode->result=0;
-
 	if(head==NULL)
 		head=newnode;
 	else
@@ -82,31 +102,24 @@ PuzzleNode *CreateNode(head);
 	return(newnode);
 }
 
-
-void ReadData(char *filename, PuzzleNode *head)
+/******************************************************************************
+ * ReadData()
+ *
+ * Arguments: filename - name of the file containing the puzzles
+ * Returns: pointer to the puzzle listing
+ * Side-Effects: none
+ *
+ * Description: Creates a list with all puzzles given in the file. Returns the pointer to that list
+ *
+ *****************************************************************************/
+PuzzleNode* ReadData(char *filename)
 {
 	FILE *fp=NULL;
-	PuzzleNode *node=NULL;
-
-
+	PuzzleNode *head=NULL;
 	fp=OpenFile(filename, "r");
 
-
-
 	while(!feof(fp))
-	{
-		
-		ReadPuzzle(fp, CreateNode(head));
-
-	}
-
-	head = CreateNode();
-	node=head;
-
-
-
-
-
-
-
+		GetPuzzle(fp, CreateNode(head));
+	fclose(fp);
+	return(head);
 }
