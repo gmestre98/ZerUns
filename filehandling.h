@@ -7,4 +7,6 @@ FILE* OpenFile ( char *filename, char *mode );
 void GetPuzzle(FILE *fp, PuzzleNode *puzzle);
 PuzzleNode* CreateNode(PuzzleNode *head);
 PuzzleNode* ReadData(char *filename);
+void DeletePuzzleList(PuzzleNode *head);
 
+#endif

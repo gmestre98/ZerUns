@@ -41,33 +41,59 @@ void GetPuzzle(FILE *fp, PuzzleNode *puzzle)
 {
 	int l, c;
 
-  	if ( fscanf ( fp, "%d %d %d %d", puzzle->size, puzzle->line, puzzle->col, puzzle->binary ) == 4 )
+  	if ( fscanf ( fp, "%d %d %d %d", &puzzle->content.size, &puzzle->content.line, &puzzle->content.col, &puzzle->content.binary ) == 4 )
   	{
-  		puzzle->matrix = (int**) malloc(sizeof(int*)*puzzle->size);
-  		if(puzzle->matrix==NULL)
+  		puzzle->content.matrix = (int**) malloc(sizeof(int*)*puzzle->content.size);
+  		if(puzzle->content.matrix==NULL)
   			exit( 0 );
-  		for(l=0; l<puzzle->size; l++)
+  		for(l=0; l<puzzle->content.size; l++)
   		{
-  			puzzle->matrix[l] = (int*) malloc(sizeof(int)*puzzle->size);
-  			if(puzzle->matrix[l]==NULL)
+  			puzzle->content.matrix[l] = (int*) malloc(sizeof(int)*puzzle->content.size);
+  			if(puzzle->content.matrix[l]==NULL)
   				exit( 0 );
   		}	
   	}
   	else
   		exit( 0 );
-  	for(l=(puzzle->size-1); l >=0; l--)
+  	for(l=(puzzle->content.size-1); l >=0; l--)
   	{
-  		for(c=0; c<puzzle->size; c++)
+  		for(c=0; c<puzzle->content.size; c++)
   		{
-  			if(fscanf(fp, "%d", puzzle->matrix[l][c])!=1)
+  			if(fscanf(fp, "%d", &puzzle->content.matrix[l][c])!=1)
   				exit( 0 );
-  			if(matrix[l][c]==0)
-  				matrix[l][c]=-1;
+  			if(puzzle->content.matrix[l][c]==0)
+  				puzzle->content.matrix[l][c]=-1;
   		}
   	}
   	return;
 }
+/******************************************************************************
+ * DeletePuzzleList()
+ *
+ * Arguments: head - pointer to the first node
+ * Returns: nothing
+ * Side-Effects: Frees all nodes from the list. Sets head pointer to NULL
+ *
+ * Description:
+ *
+ *****************************************************************************/
+void DeletePuzzleList(PuzzleNode *head)
+{
+	PuzzleNode *aux=head;
+	int l;
 
+	while(aux!=NULL)
+	{
+		aux=aux->next;
+		for(l=0; l<head->content.size; l++)
+			free(head->content.matrix[l]);
+		free(head->content.matrix);
+		free(head);
+		head=aux;
+	}
+	head=NULL;
+	return;
+}
 /******************************************************************************
  * CreateNode()
  *
@@ -78,18 +104,18 @@ void GetPuzzle(FILE *fp, PuzzleNode *puzzle)
  * Description:
  *
  *****************************************************************************/
-PuzzleNode* CreateNode(PuzzleNode *head);
+PuzzleNode* CreateNode(PuzzleNode *head)
 {
 	PuzzleNode *newnode, *aux;
 	newnode= (PuzzleNode*) malloc(sizeof(Puzzle));
 	if(newnode==NULL)
 		exit( 0 );
-	newnode->size=0;
-	newnode->line=0;
-	newnode->col=0;
-	newnode->binary=0;
-	newnode->matrix=NULL;
-	newnode->result=0;
+	newnode->content.size=0;
+	newnode->content.line=0;
+	newnode->content.col=0;
+	newnode->content.binary=0;
+	newnode->content.matrix=NULL;
+	newnode->content.result=0;
 	if(head==NULL)
 		head=newnode;
 	else

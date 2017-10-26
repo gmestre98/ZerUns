@@ -1,3 +1,5 @@
+#ifndef MACRO
+#define MACRO
 #include <stdlib.h>
 #include <stdio.h>
 #define PRINTERROR(...) ( fprintf(stderr,__VA_ARGS__));
@@ -13,6 +15,7 @@ typedef struct Puzzle{
 } Puzzle;
 
 typedef struct PuzzleNode{
-	struct Puzzle content;
-	struct Puzzle *next;
+	Puzzle content;
+	struct PuzzleNode *next;
 } PuzzleNode;
+#endif
