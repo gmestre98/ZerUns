@@ -4,9 +4,10 @@
 
 
 FILE* OpenFile ( char *filename, char *mode );
-void GetPuzzle(FILE *fp, PuzzleNode *puzzle);
-PuzzleNode* CreateNode(PuzzleNode *head);
+int GetPuzzle(FILE *fp,PuzzleNode **head, PuzzleNode *puzzle);
+PuzzleNode* CreateNode();
 PuzzleNode* ReadData(char *filename);
-void DeletePuzzleList(PuzzleNode *head);
+void DeletePuzzleList(PuzzleNode **head);
+void AddNode(PuzzleNode **head, PuzzleNode *node);
 
 #endif
