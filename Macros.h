@@ -1,3 +1,4 @@
+
 /******************************************************************************
  *
  * File Name: Macros.h
@@ -11,12 +12,16 @@
  *  File containing the important Macros definitions for the project
  *
  *****************************************************************************/
+
+#ifndef MACRO
+#define MACRO
 #include <stdlib.h>
 #include <stdio.h>
 #define PRINTERROR(...) ( fprintf(stderr,__VA_ARGS__));
 #define CRASH exit(0);
 
 typedef struct Puzzle{
+
     int size;
     int line;
     int col;
@@ -29,3 +34,4 @@ typedef struct PuzzleNode{
     struct Puzzle content;
     struct Puzzle* next;
 }PuzzleNode;
+#endif

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "filehandling.h"
 #include "Macros.h"
 
 int main(int argc, char *argv[])
