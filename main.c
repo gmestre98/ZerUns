@@ -17,22 +17,28 @@
 #include <string.h>
 #include "filehandling.h"
 #include "Macros.h"
+#include "Reader.h"
+
 
 int main(int argc, char *argv[])
 {
     char *token = NULL;
+    char str[100];
     PuzzleNode *head = NULL;
 
     if(argc < 2)
     {
-        PRINTERROR("Insuficient number of arguments!\n\n")
         CRASH
     }
-    token = strtok(argv[1], ".");
+    strcpy(str, argv[1]);
+    token = strtok(str, ".");
     token = strtok(NULL, ".");
-    if(strcmp(token, "puz") == 0)
+    if(strcmp(token, "puz") != 0)
     {
-        PRINTERROR("Incorrect puzzle extension!\n\n");
         CRASH
     }
+    head = ReadData(argv[1]);
+    PuzzlesReading(head);
+    PrintShit(head);
+    DeletePuzzleList(&head);
 }

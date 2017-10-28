@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *
  * File Name: Macros.h
@@ -17,11 +16,9 @@
 #define MACRO
 #include <stdlib.h>
 #include <stdio.h>
-#define PRINTERROR(...) ( fprintf(stderr,__VA_ARGS__));
 #define CRASH exit(0);
 
 typedef struct Puzzle{
-
     int size;
     int line;
     int col;
@@ -32,6 +29,6 @@ typedef struct Puzzle{
 
 typedef struct PuzzleNode{
     struct Puzzle content;
-    struct Puzzle* next;
+    struct PuzzleNode* next;
 }PuzzleNode;
 #endif

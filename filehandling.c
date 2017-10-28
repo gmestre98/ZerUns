@@ -1,7 +1,21 @@
+/******************************************************************************
+ *
+ * File Name: Macros.h
+ * Author:    Gonçalo Mestre nº 87005  &  Guilherme Guerreiro nº87010
+ * Revision:  26 Oct 2017
+ *
+ * NAME
+ *  Macros - Important definitions
+ *
+ * DESCRIPTION
+ *  File containing the handling of all files
+ *
+ *****************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include "filehandling.h"
 #include "Macros.h"
+#include "Reader.h"
 
 /******************************************************************************
  * OpenFile()
@@ -16,11 +30,11 @@
  *****************************************************************************/
 FILE* OpenFile ( char *filename, char *mode )
 {
-  FILE *f;
-  f = fopen ( filename, mode );
+  FILE *f = NULL;
+  f = fopen (filename, mode);
   if ( f == NULL )
   {
-  	exit ( 0 );
+  	CRASH
   }
   return (f);
 }
@@ -29,29 +43,37 @@ FILE* OpenFile ( char *filename, char *mode )
  * GetPuzzle()
  *
  * Arguments: fp - pointer to opened file
- *            puzzle - pointer to node which contains the struct that holds the puzzle info
+ *            puzzle - pointer to node which contains the struct that holds the
+ *                     puzzle info
  * Returns: nothing
- * Side-Effects: All the 0's read in the file matrix are changed into -1's in the node matrix.
+ * Side-Effects: All the 0's read in the file matrix are changed into -1's in
+ *               the node matrix.
  * If given invalid inputs, the program exits
  *
  * Description:
  *
  *****************************************************************************/
-int GetPuzzle(FILE *fp,PuzzleNode **head, PuzzleNode *puzzle)
+int GetPuzzle(FILE *fp, PuzzleNode **head, PuzzleNode *puzzle)
 {
-	int l, c;
+	int l = 0;
+    int c = 0;
 
-  	if ( fscanf ( fp, "%d %d %d %d", &puzzle->content.size, &puzzle->content.line, &puzzle->content.col, &puzzle->content.binary ) == 4)
+  	if ( fscanf ( fp, "%d %d %d %d", &puzzle->content.size,
+    &puzzle->content.line, &puzzle->content.col, &puzzle->content.binary ) == 4)
   	{
-  		puzzle->content.matrix = (int**) malloc(sizeof(int*)*puzzle->content.size);
-  		if(puzzle->content.matrix==NULL)
-  			exit( 0 );
-  		for(l=0; l<puzzle->content.size; l++)
+  		puzzle->content.matrix = (int**)malloc(sizeof(int*)*(puzzle->content.size));
+  		if(puzzle->content.matrix == NULL)
+      {
+        CRASH
+      }
+  		for(l=0; l < puzzle->content.size; l++)
   		{
-  			puzzle->content.matrix[l] = (int*) malloc(sizeof(int)*puzzle->content.size);
+  			puzzle->content.matrix[l] = (int*)malloc(sizeof(int)*puzzle->content.size);
   			if(puzzle->content.matrix[l]==NULL)
-  				exit( 0 );
-  		}	
+        {
+          CRASH
+        }
+  		}
   	}
   	else if(feof(fp))
   	{
@@ -59,19 +81,22 @@ int GetPuzzle(FILE *fp,PuzzleNode **head, PuzzleNode *puzzle)
   		return 0;
   	}
   	else
-  		exit(0);
-  	for(l=(puzzle->content.size-1); l >=0; l--)
+    {
+      CRASH
+    }
+
+  	for(l = (puzzle->content.size-1); l >=0; l--)
   	{
-  		for(c=0; c<puzzle->content.size; c++)
+  		for(c = 0; c < puzzle->content.size; c++)
   		{
   			if(fscanf(fp, "%d", &puzzle->content.matrix[l][c])!=1)
-  				exit( 0 );
-  			if(puzzle->content.matrix[l][c]==0)
-  				puzzle->content.matrix[l][c]=-1;
+        {
+          CRASH
+        }
   		}
   	}
-  	 	AddNode(head, puzzle);
-  		return 1;
+   	AddNode(head, puzzle);
+		return 1;
 }
 /******************************************************************************
  * DeletePuzzleList()
@@ -85,19 +110,20 @@ int GetPuzzle(FILE *fp,PuzzleNode **head, PuzzleNode *puzzle)
  *****************************************************************************/
 void DeletePuzzleList(PuzzleNode **head)
 {
-	PuzzleNode *aux=*head;
+	PuzzleNode *aux = *head;
 	int l;
 
-	while(aux!=NULL)
+	while(*head != NULL)
 	{
-		aux=aux->next;
-		for(l=0; l<(*head)->content.size; l++)
+		aux = (*head)->next;
+		for(l = 0; l < (*head)->content.size; l++)
+    {
 			free((*head)->content.matrix[l]);
+    }
 		free((*head)->content.matrix);
 		free(*head);
-		*head=aux;
+		*head = aux;
 	}
-	*head=NULL;
 	return;
 }
 /******************************************************************************
@@ -113,16 +139,18 @@ void DeletePuzzleList(PuzzleNode **head)
 PuzzleNode* CreateNode()
 {
 	PuzzleNode *newnode;
-	newnode= (PuzzleNode*) malloc(sizeof(PuzzleNode));
-	if(newnode==NULL)
-		exit( 0 );
-	newnode->content.size=0;
-	newnode->content.line=0;
-	newnode->content.col=0;
-	newnode->content.binary=0;
-	newnode->content.result=0;
-	newnode->content.matrix=NULL;
-	newnode->next=NULL;
+	newnode = (PuzzleNode*)malloc(sizeof(PuzzleNode));
+	if(newnode == NULL)
+  {
+    CRASH
+  }
+	newnode->content.size = 0;
+	newnode->content.line = 0;
+	newnode->content.col = 0;
+	newnode->content.binary = 0;
+	newnode->content.result = 0;
+	newnode->content.matrix = NULL;
+	newnode->next = NULL;
 	return(newnode);
 }
 
@@ -138,17 +166,23 @@ PuzzleNode* CreateNode()
  *****************************************************************************/
 void AddNode(PuzzleNode **head, PuzzleNode *node)
 {
-	PuzzleNode *aux=*head;
+	PuzzleNode *aux = *head;
 
-	if(node==NULL)
-		exit( 0 );
-	if(*head==NULL)
-		*head=node;
-	else
+	if(node == NULL)
+  {
+    CRASH
+  }
+	if(*head == NULL)
 	{
-		while(aux->next!=NULL)
-			aux=aux->next;
-		aux->next=node;
+    *head = node;
+  }
+  else
+	{
+		while(aux->next != NULL)
+		{
+      aux = aux->next;
+    }
+    aux->next = node;
 	}
 	return;
 }
@@ -160,16 +194,40 @@ void AddNode(PuzzleNode **head, PuzzleNode *node)
  * Returns: pointer to the puzzle listing
  * Side-Effects: none
  *
- * Description: Creates a list with all puzzles given in the file. Returns the pointer to that list
+ * Description: Creates a list with all puzzles given in the file.
+ *              Returns the pointer to that list
  *
  *****************************************************************************/
 PuzzleNode* ReadData(char *filename)
 {
-	FILE *fp=NULL;
-	PuzzleNode *head=NULL;
+	FILE *fp = NULL;
+	PuzzleNode *head = NULL;
 
-	fp=OpenFile(filename, "r");
+	fp = OpenFile(filename, "r");
 	while(GetPuzzle(fp, &head, CreateNode()));
 	fclose(fp);
 	return(head);
+}
+
+
+void PrintShit(PuzzleNode *head)
+{
+  int i, j;
+  while(head != NULL)
+  {
+    printf("%d ", head->content.size);
+    printf("%d ", head->content.line);
+    printf("%d ", head->content.col);
+    printf("%d\n", head->content.binary);
+    for(i=head->content.size - 1 ; i >= 0; i--)
+    {
+      for(j=0; j < head->content.size; j++)
+      {
+        printf("%d", head->content.matrix[i][j]);
+      }
+      printf("\n");
+    }
+    printf("\n%d\n\n\n", head->content.result);
+    head = head->next;
+  }
 }
