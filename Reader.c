@@ -19,10 +19,10 @@
 /******************************************************************************
  * PuzzlesReading()
  *
- * Arguments: head of the puzzles list
+ * Arguments: Puzzle with teh data to read
  * Returns: nothing
  *
- * Description: Reads the puzzles finding the desired answer
+ * Description: Reads the puzzle finding the desired answer
  *
  *****************************************************************************/
 void PuzzlesReading(Puzzle* Puzz)
@@ -44,7 +44,7 @@ void PuzzlesReading(Puzzle* Puzz)
 /******************************************************************************
  * ReadLine()
  *
- * Arguments: PuzzleNode to read
+ * Arguments: Puzzle with the data to read
  * Returns: The binary result from the reading of the lines
  *
  * Description: Reads the line of the puzzle for the chosen position
@@ -83,7 +83,7 @@ int ReadLine(Puzzle* Puzz)
 /******************************************************************************
  * ReadCol()
  *
- * Arguments: PuzzleNode to read
+ * Arguments: Puzzle with the data to read
  * Returns: The binary result from the reading of the columns
  *
  * Description: Reads the column of the puzzle for the chosen position
@@ -122,7 +122,7 @@ int ReadCol(Puzzle* Puzz)
 /******************************************************************************
  * ReadSums()
  *
- * Arguments: PuzzleNode to read
+ * Arguments: Puzzle with the data to read
  * Returns: The binary result from the reading of the sums
  *
  * Description: Reads the lines and columns of the puzzle for the sum

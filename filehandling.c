@@ -43,12 +43,9 @@ FILE* OpenFile(char *filename, char *mode)
  * GetPuzzle()
  *
  * Arguments: fp - pointer to opened file
- *            puzzle - pointer to node which contains the struct that holds the
- *                     puzzle info
+ *            puzzle - Pointer to puzzle that will contain the data
  * Returns: nothing
- * Side-Effects: All the 0's read in the file matrix are changed into -1's in
- *               the node matrix.
- * If given invalid inputs, the program exits
+ * Side-Effects: If given invalid inputs, the program exits
  *
  * Description:
  *
@@ -99,11 +96,11 @@ int GetPuzzle(FILE *fp, Puzzle *Puzzle)
 
 
 /******************************************************************************
- * CreateNode()
+ * ResetPuzzle()
  *
- * Arguments: none
- * Returns: pointer to new node
- * Side-Effects: Allocs mem to one puzzlenode struct and initializes it
+ * Arguments: Pointer to a puzzle that contains data
+ * Returns: none
+ * Side-Effects: Reinitializes all the values of the puzzle
  *
  * Description:
  *
@@ -118,15 +115,16 @@ void ResetPuzzle(Puzzle* Puzzle)
   Puzzle->matrix = NULL;
 }
 
+
 /******************************************************************************
  * ReadData()
  *
  * Arguments: filename - name of the file containing the puzzles
- * Returns: pointer to the puzzle listing
+ * Returns: none
  * Side-Effects: none
  *
- * Description: Creates a list with all puzzles given in the file.
- *              Returns the pointer to that list
+ * Description: Opens the file, reads this one and then calls the functions to
+ *            read the data and write the solution
  *
  *****************************************************************************/
 void ReadData(char *filename)
@@ -163,7 +161,8 @@ void ReadData(char *filename)
 /******************************************************************************
  * SolutionWriter()
  *
- * Arguments: Head of the puzzles list, name of the puzzles file
+ * Arguments: Puzzle with the data to write, string with the file name, number
+ *            of the current writing puzzle
  * Returns: none
  * Side-Effects: none
  *
