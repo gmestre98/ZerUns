@@ -25,24 +25,19 @@
  * Description: Reads the puzzles finding the desired answer
  *
  *****************************************************************************/
-void PuzzlesReading(PuzzleNode *head)
+void PuzzlesReading(Puzzle* Puzz)
 {
   int binary = -1;
-  while(head != NULL)
+  binary = ReadLine(Puzz);
+  binary = ReadCol(Puzz);
+  binary = ReadSums(Puzz);
+  if(binary == Puzz->binary)
   {
-    binary = ReadLine(head);
-    binary = ReadCol(head);
-    binary = ReadSums(head);
-    if(binary == head->content.binary)
-    {
-      head->content.result = 1;
-    }
-    else if(binary != -1)
-    {
-      head->content.result = -1;
-    }
-    binary = -1;
-    head = head->next;
+    Puzz->result = 1;
+  }
+  else if(binary != -1)
+  {
+    Puzz->result = -1;
   }
 }
 
@@ -55,30 +50,30 @@ void PuzzlesReading(PuzzleNode *head)
  * Description: Reads the line of the puzzle for the chosen position
  *
  *****************************************************************************/
-int ReadLine(PuzzleNode *Node)
+int ReadLine(Puzzle* Puzz)
 {
   int binary = -1;
-  int l = Node->content.line - 1;
-  int c = Node->content.col - 1;
-  if(l < Node->content.size -2)
+  int l = Puzz->line - 1;
+  int c = Puzz->col - 1;
+  if(l < Puzz->size -2)
   {
-    if((Node->content.matrix[l+1][c] + Node->content.matrix[l+2][c])%2 == 0)
+    if((Puzz->matrix[l+1][c] + Puzz->matrix[l+2][c])%2 == 0)
     {
-      binary = (Node->content.matrix[l+1][c])/2;
+      binary = (Puzz->matrix[l+1][c])/2;
     }
   }
-  if(l < Node->content.size - 1  && l > 0)
+  if(l < Puzz->size - 1  && l > 0)
   {
-    if((Node->content.matrix[l-1][c] + Node->content.matrix[l+1][c])%2 == 0)
+    if((Puzz->matrix[l-1][c] + Puzz->matrix[l+1][c])%2 == 0)
     {
-      binary = (Node->content.matrix[l+1][c])/2;
+      binary = (Puzz->matrix[l+1][c])/2;
     }
   }
   if(l > 1)
   {
-    if((Node->content.matrix[l-2][c] + Node->content.matrix[l-1][c])%2 == 0)
+    if((Puzz->matrix[l-2][c] + Puzz->matrix[l-1][c])%2 == 0)
     {
-      binary = (Node->content.matrix[l-1][c])/2;
+      binary = (Puzz->matrix[l-1][c])/2;
     }
   }
   return binary;
@@ -94,31 +89,31 @@ int ReadLine(PuzzleNode *Node)
  * Description: Reads the column of the puzzle for the chosen position
  *
  *****************************************************************************/
-int ReadCol(PuzzleNode *Node)
+int ReadCol(Puzzle* Puzz)
 {
   int binary = -1;
-  int l = Node->content.line - 1;
-  int c = Node->content.col - 1;
+  int l = Puzz->line - 1;
+  int c = Puzz->col - 1;
 
-  if(c < Node->content.size -2)
+  if(c < Puzz->size -2)
   {
-    if((Node->content.matrix[l][c+1] + Node->content.matrix[l][c+2])%2 == 0)
+    if((Puzz->matrix[l][c+1] + Puzz->matrix[l][c+2])%2 == 0)
     {
-      binary = (Node->content.matrix[l][c+1])/2;
+      binary = (Puzz->matrix[l][c+1])/2;
     }
   }
-  if(c < Node->content.size - 1  && c > 0)
+  if(c < Puzz->size - 1  && c > 0)
   {
-    if((Node->content.matrix[l][c-1] + Node->content.matrix[l][c+1])%2 == 0)
+    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c+1])%2 == 0)
     {
-      binary = (Node->content.matrix[l][c-1])/2;
+      binary = (Puzz->matrix[l][c-1])/2;
     }
   }
   if(c > 1)
   {
-    if((Node->content.matrix[l][c-1] + Node->content.matrix[l][c-2])%2 == 0)
+    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c-2])%2 == 0)
     {
-      binary = (Node->content.matrix[l-1][c])/2;
+      binary = (Puzz->matrix[l-1][c])/2;
     }
   }
   return binary;
@@ -133,55 +128,55 @@ int ReadCol(PuzzleNode *Node)
  * Description: Reads the lines and columns of the puzzle for the sum
  *
  *****************************************************************************/
-int ReadSums(PuzzleNode *Node)
+int ReadSums(Puzzle *Puzz)
 {
   int binary = -1;
   int i = 0;
   int onesum = 0;
   int zerosum = 0;
   int ninecount = 0;
-  int l = Node->content.line - 1;
-  int c = Node->content.col - 1;
+  int l = Puzz->line - 1;
+  int c = Puzz->col - 1;
   /* line verification */
-  for(i=0; i < Node->content.size; i++)
+  for(i=0; i < Puzz->size; i++)
   {
-    if(Node->content.matrix[i][c] != 9)
+    if(Puzz->matrix[i][c] != 9)
     {
-      onesum += Node->content.matrix[i][c];
+      onesum += Puzz->matrix[i][c];
     }
     else
     {
       ninecount ++;
     }
   }
-  zerosum = Node->content.size - ninecount - onesum;
-  if(zerosum == (Node->content.size/2))
+  zerosum = Puzz->size - ninecount - onesum;
+  if(zerosum == (Puzz->size/2))
   {
     binary = 1;
   }
-  else if(onesum == (Node->content.size/2))
+  else if(onesum == (Puzz->size/2))
   {
     binary = 0;
   }
 
   /* column verification */
-  for(i=0; i < Node->content.size; i++)
+  for(i=0; i < Puzz->size; i++)
   {
-    if(Node->content.matrix[l][i] != 9)
+    if(Puzz->matrix[l][i] != 9)
     {
-      onesum += Node->content.matrix[l][i];
+      onesum += Puzz->matrix[l][i];
     }
     else
     {
       ninecount ++;
     }
   }
-  zerosum = Node->content.size - ninecount - onesum;
-  if(zerosum == (Node->content.size/2))
+  zerosum = Puzz->size - ninecount - onesum;
+  if(zerosum == (Puzz->size/2))
   {
     binary = 1;
   }
-  else if(onesum == (Node->content.size/2))
+  else if(onesum == (Puzz->size/2))
   {
     binary = 0;
   }

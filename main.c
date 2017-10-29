@@ -17,14 +17,12 @@
 #include <string.h>
 #include "filehandling.h"
 #include "Macros.h"
-#include "Reader.h"
 
 
 int main(int argc, char *argv[])
 {
     char *token = NULL;
-    char str[100];
-    PuzzleNode *head = NULL;
+    char str[100] = {0};
 
     if(argc < 2)
     {
@@ -37,10 +35,6 @@ int main(int argc, char *argv[])
     {
         CRASH
     }
-    head = ReadData(argv[1]);
-    PuzzlesReading(head);
-    /* PrintShit(head); */
-    SolutionWriter(head, argv[1]);
-    DeletePuzzleList(&head);
+    ReadData(argv[1]);
     return 0;
 }
