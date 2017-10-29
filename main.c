@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     }
     head = ReadData(argv[1]);
     PuzzlesReading(head);
-    PrintShit(head);
+    /* PrintShit(head); */
+    SolutionWriter(head, argv[1]);
     DeletePuzzleList(&head);
+    return 0;
 }

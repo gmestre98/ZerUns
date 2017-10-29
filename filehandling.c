@@ -13,9 +13,8 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "filehandling.h"
-#include "Macros.h"
-#include "Reader.h"
 
 /******************************************************************************
  * OpenFile()
@@ -210,6 +209,49 @@ PuzzleNode* ReadData(char *filename)
 }
 
 
+/******************************************************************************
+ * SolutionWriter()
+ *
+ * Arguments: Head of the puzzles list, name of the puzzles file
+ * Returns: none
+ * Side-Effects: none
+ *
+ * Description: Creates a file where the puzzles solutions are written
+ *
+ *****************************************************************************/
+void SolutionWriter(PuzzleNode *head, char *str)
+{
+  FILE *fp = NULL;
+  char *token = NULL;
+  char extension[] = ".sol";
+  int i = 0;
+
+  token = strtok(str, ".");
+  strcat(token, extension);
+  fp = OpenFile(token, "w");
+  if(fp == NULL)
+  {
+    exit(0);
+  }
+  while(head!= NULL)
+  {
+    i++;
+    fprintf(fp, "Puzzle %d:\n", i);
+    fprintf(fp, "%d ", head->content.size);
+    fprintf(fp, "%d ", head->content.line);
+    fprintf(fp, "%d ", head->content.col);
+    fprintf(fp, "%d ", head->content.binary);
+    fprintf(fp, "%d\n\n", head->content.result);
+    head = head->next;
+  }
+  fclose(fp);
+}
+
+
+
+
+
+/*
 void PrintShit(PuzzleNode *head)
 {
   int i, j;
@@ -231,3 +273,4 @@ void PrintShit(PuzzleNode *head)
     head = head->next;
   }
 }
+*/

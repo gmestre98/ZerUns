@@ -13,6 +13,9 @@
  *****************************************************************************/
 #ifndef MANAGE_FILES
 #define MANAGE_FILES
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "Macros.h"
 
 
@@ -22,5 +25,6 @@ PuzzleNode* CreateNode();
 PuzzleNode* ReadData(char *filename);
 void DeletePuzzleList(PuzzleNode **head);
 void AddNode(PuzzleNode **head, PuzzleNode *node);
+void SolutionWriter(PuzzleNode *, char *);
 
 #endif
