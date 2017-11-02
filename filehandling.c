@@ -145,7 +145,11 @@ void ReadData(char *filename)
 	while(GetPuzzle(fp, Puzz))
   {
     i++;
-    PuzzlesReading(Puzz);
+    if(Puzz->line > 0  &&  Puzz->col > 0  &&  Puzz->line <= Puzz->size  &&
+      Puzz->col <= Puzz->size)
+    {
+      PuzzlesReading(Puzz);
+    }
     SolutionWriter(Puzz, filename, i);
     for(l=0; l < Puzz->size; l++)
     {
@@ -172,12 +176,34 @@ void ReadData(char *filename)
 void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
 {
   FILE *fp = NULL;
-  char *token = NULL;
-  char extension[] = ".sol";
+  char *filename = NULL;
+  char extension[] = ".query";
+  int i = 0;
+  int indice = 0;
+  int len = 0;
 
-  token = strtok(str, ".");
-  strcat(token, extension);
-  fp = OpenFile(token, "a");
+  len = strlen(extension);
+  for(i=0; str[i] != '\0'; i++)
+  {
+    if(str[i] == '.')
+    {
+      indice = i;
+    }
+  }
+  filename = (char*)malloc((indice+len)*sizeof(char));
+  if(filename == NULL)
+  {
+    exit(0);
+  }
+  for(i=0; i < indice; i++)
+  {
+    filename[i] = str[i];
+  }
+  for(i=indice; i < indice+len; i++)
+  {
+    filename[i] = extension[i-indice];
+  }
+  fp = OpenFile(filename, "a");
   if(fp == NULL)
   {
     exit(0);
@@ -187,8 +213,15 @@ void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
   fprintf(fp, "%d ", Puzz->line);
   fprintf(fp, "%d ", Puzz->col);
   fprintf(fp, "%d ", Puzz->binary);
-  fprintf(fp, "%d\n\n", Puzz->result);
+
+  if(Puzz->line > 0  &&  Puzz->col > 0  &&  Puzz->line <= Puzz->size  &&
+    Puzz->col <= Puzz->size  &&  (Puzz->binary == 1  ||  Puzz->binary == 0))
+  {
+    fprintf(fp, "%d", Puzz->result);
+  }
+  fprintf(fp, "\n\n");
   fclose(fp);
+  free(filename);
 }
 
 

@@ -28,9 +28,27 @@
 void PuzzlesReading(Puzzle* Puzz)
 {
   int binary = -1;
+  if(Puzz->matrix[Puzz->line - 1][Puzz->col - 1] != 9)
+  {
+    if(Puzz->binary == Puzz->matrix[Puzz->line - 1][Puzz->col - 1])
+    {
+      Puzz->result = 1;
+    }
+    else
+    {
+      Puzz->result = -1;
+    }
+    return;
+  }
   binary = ReadLine(Puzz);
-  binary = ReadCol(Puzz);
-  binary = ReadSums(Puzz);
+  if (binary == -1)
+  {
+    binary = ReadCol(Puzz);
+  }
+  if(binary == -1)
+  {
+    binary = ReadSums(Puzz);
+  }
   if(binary == Puzz->binary)
   {
     Puzz->result = 1;
@@ -57,23 +75,26 @@ int ReadLine(Puzzle* Puzz)
   int c = Puzz->col - 1;
   if(l < Puzz->size -2)
   {
-    if((Puzz->matrix[l+1][c] + Puzz->matrix[l+2][c])%2 == 0)
+    if((Puzz->matrix[l+1][c] + Puzz->matrix[l+2][c])%2 == 0  &&
+        Puzz->matrix[l+1][c] != 9  &&  Puzz->matrix[l+2][c] != 9)
     {
-      binary = (Puzz->matrix[l+1][c])/2;
+      binary = (((Puzz->matrix[l+1][c] + Puzz->matrix[l+2][c])/2)-1)*(-1);
     }
   }
   if(l < Puzz->size - 1  && l > 0)
   {
-    if((Puzz->matrix[l-1][c] + Puzz->matrix[l+1][c])%2 == 0)
+    if((Puzz->matrix[l-1][c] + Puzz->matrix[l+1][c])%2 == 0  &&
+        Puzz->matrix[l+1][c] != 9  &&  Puzz->matrix[l-1][c] != 9)
     {
-      binary = (Puzz->matrix[l+1][c])/2;
+      binary = (((Puzz->matrix[l+1][c] + Puzz->matrix[l-1][c])/2)-1)*(-1);
     }
   }
   if(l > 1)
   {
-    if((Puzz->matrix[l-2][c] + Puzz->matrix[l-1][c])%2 == 0)
+    if((Puzz->matrix[l-2][c] + Puzz->matrix[l-1][c])%2 == 0  &&
+        Puzz->matrix[l-1][c] != 9  &&  Puzz->matrix[l-2][c] != 9)
     {
-      binary = (Puzz->matrix[l-1][c])/2;
+      binary = (((Puzz->matrix[l-1][c] + Puzz->matrix[l-2][c])/2)-1)*(-1);
     }
   }
   return binary;
@@ -97,23 +118,26 @@ int ReadCol(Puzzle* Puzz)
 
   if(c < Puzz->size -2)
   {
-    if((Puzz->matrix[l][c+1] + Puzz->matrix[l][c+2])%2 == 0)
+    if((Puzz->matrix[l][c+1] + Puzz->matrix[l][c+2])%2 == 0  &&
+        Puzz->matrix[l][c+1] != 9  &&  Puzz->matrix[l][c+2] != 9)
     {
-      binary = (Puzz->matrix[l][c+1])/2;
+      binary = (((Puzz->matrix[l][c+1] + Puzz->matrix[l][c+2])/2)-1)*(-1);
     }
   }
   if(c < Puzz->size - 1  && c > 0)
   {
-    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c+1])%2 == 0)
+    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c+1])%2 == 0  &&
+        Puzz->matrix[l][c+1] != 9  &&  Puzz->matrix[l][c-1] != 9)
     {
-      binary = (Puzz->matrix[l][c-1])/2;
+      binary = (((Puzz->matrix[l][c+1] + Puzz->matrix[l][c-1])/2)-1)*(-1);
     }
   }
   if(c > 1)
   {
-    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c-2])%2 == 0)
+    if((Puzz->matrix[l][c-1] + Puzz->matrix[l][c-2])%2 == 0  &&
+        Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c-2] != 9)
     {
-      binary = (Puzz->matrix[l-1][c])/2;
+      binary = (((Puzz->matrix[l][c-1] + Puzz->matrix[l][c-2])/2)-1)*(-1);
     }
   }
   return binary;
@@ -158,7 +182,9 @@ int ReadSums(Puzzle *Puzz)
   {
     binary = 0;
   }
-
+  onesum = 0;
+  zerosum = 0;
+  ninecount = 0;
   /* column verification */
   for(i=0; i < Puzz->size; i++)
   {

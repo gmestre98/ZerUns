@@ -30,8 +30,11 @@ int main(int argc, char *argv[])
     }
     strcpy(str, argv[1]);
     token = strtok(str, ".");
-    token = strtok(NULL, ".");
-    if(strcmp(token, "puz") != 0)
+    while(token != NULL  &&  strcmp(token, "puz") != 0)
+    {
+      token = strtok(NULL, ".");
+    }
+    if(token == NULL)
     {
         CRASH
     }
