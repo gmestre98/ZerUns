@@ -17,14 +17,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "Macros.h"
+#include "Reader.h"
 
 
-FILE* OpenFile ( char *filename, char *mode );
-int GetPuzzle(FILE *fp,PuzzleNode **head, PuzzleNode *puzzle);
-PuzzleNode* CreateNode();
-PuzzleNode* ReadData(char *filename);
-void DeletePuzzleList(PuzzleNode **head);
-void AddNode(PuzzleNode **head, PuzzleNode *node);
-void SolutionWriter(PuzzleNode *, char *);
+FILE* OpenFile (char*, char*);
+int GetPuzzle(FILE*, Puzzle*);
+void ResetPuzzle(Puzzle*);
+void ReadData(char *filename);
+void SolutionWriter(Puzzle*, char *, int);
 
 #endif

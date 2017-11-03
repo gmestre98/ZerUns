@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "Macros.h"
 
-void PuzzlesReading(PuzzleNode*);
-int ReadLine(PuzzleNode*);
-int ReadCol(PuzzleNode*);
-int ReadSums(PuzzleNode*);
+void PuzzlesReading(Puzzle*);
+int ReadLine(Puzzle*);
+int ReadCol(Puzzle*);
+int ReadSums(Puzzle*);

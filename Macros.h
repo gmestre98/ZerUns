@@ -27,8 +27,4 @@ typedef struct Puzzle{
     int result;
 }Puzzle;
 
-typedef struct PuzzleNode{
-    struct Puzzle content;
-    struct PuzzleNode* next;
-}PuzzleNode;
 #endif
