@@ -190,7 +190,7 @@ void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
       indice = i;
     }
   }
-  filename = (char*)malloc((indice+len)*sizeof(char));
+  filename = (char*)malloc((indice+len+1)*sizeof(char));
   if(filename == NULL)
   {
     exit(0);
@@ -199,7 +199,7 @@ void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
   {
     filename[i] = str[i];
   }
-  for(i=indice; i < indice+len; i++)
+  for(i=indice; i <= indice+len; i++)
   {
     filename[i] = extension[i-indice];
   }
