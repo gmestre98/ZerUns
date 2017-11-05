@@ -206,6 +206,7 @@ void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
   fp = OpenFile(filename, "a");
   if(fp == NULL)
   {
+  	free(filename);
     exit(0);
   }
   fprintf(fp, "Puzzle %d:\n", Puzzleref);
