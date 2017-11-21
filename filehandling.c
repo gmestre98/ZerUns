@@ -129,7 +129,6 @@ void ResetPuzzle(Puzzle* Puzzle)
  *****************************************************************************/
 void ReadData(char *filename)
 {
-  int i = 0;
   int l = 0;
   FILE* fp = NULL;
 	Puzzle* Puzz = NULL;
@@ -144,13 +143,12 @@ void ReadData(char *filename)
   ResetPuzzle(Puzz);
 	while(GetPuzzle(fp, Puzz))
   {
-    i++;
     if(Puzz->line > 0  &&  Puzz->col > 0  &&  Puzz->line <= Puzz->size  &&
       Puzz->col <= Puzz->size)
     {
       PuzzlesReading(Puzz);
     }
-    SolutionWriter(Puzz, filename, i);
+    SolutionWriter(Puzz, filename);
     for(l=0; l < Puzz->size; l++)
     {
       free(Puzz->matrix[l]);
@@ -173,7 +171,7 @@ void ReadData(char *filename)
  * Description: Creates a file where the puzzles solutions are written
  *
  *****************************************************************************/
-void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
+void SolutionWriter(Puzzle* Puzz, char *str)
 {
   FILE *fp = NULL;
   char *filename = NULL;
@@ -209,7 +207,6 @@ void SolutionWriter(Puzzle* Puzz, char *str, int Puzzleref)
   	free(filename);
     exit(0);
   }
-  fprintf(fp, "Puzzle %d:\n", Puzzleref);
   fprintf(fp, "%d ", Puzz->size);
   fprintf(fp, "%d ", Puzz->line);
   fprintf(fp, "%d ", Puzz->col);

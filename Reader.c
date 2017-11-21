@@ -41,9 +41,26 @@ void PuzzlesReading(Puzzle* Puzz)
     return;
   }
   binary = ReadLine(Puzz);
-  if (binary == -1)
+  if(binary != -1)
+  {
+    if((ReadCol(Puzz) != -1  &&  ReadCol(Puzz) != binary)  ||
+      (ReadSums(Puzz) != -1  &&  ReadSums(Puzz) != binary))
+    {
+      Puzz->result = -1;
+      return;
+    }
+  }
+  if(binary == -1)
   {
     binary = ReadCol(Puzz);
+    if(binary != -1)
+    {
+      if(ReadSums(Puzz) != -1  &&  ReadSums(Puzz) != binary)
+      {
+        Puzz->result = -1;
+        return;
+      }
+    }
   }
   if(binary == -1)
   {

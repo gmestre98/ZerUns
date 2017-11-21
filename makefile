@@ -17,7 +17,7 @@
 CC = gcc
 
 #  Compiler Flags
-CFLAGS = -g -Wall -ansi -pedantic
+CFLAGS = -Wall -ansi -O3
 
 #  Sources
 SOURCES =  main.c filehandling.c Reader.c
@@ -25,14 +25,14 @@ SOURCES =  main.c filehandling.c Reader.c
 #  Objects
 OBJECTS = main.o filehandling.o Reader.o
 
-ZerUns: $(OBJECTS)
+zeruns: $(OBJECTS)
 	gcc -g -o $@ $(OBJECTS)
 
 filehandling.o: filehandling.h filehandling.c
 Reader.o: Reader.h Reader.c
 
 clean::
-	rm -f *.o core a.out ZerUns *~
+	rm -f *.o core a.out zeruns *~
 
 depend::
 	makedepend $(SOURCES)

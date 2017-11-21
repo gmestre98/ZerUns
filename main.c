@@ -39,5 +39,5 @@ int main(int argc, char *argv[])
         CRASH
     }
     ReadData(argv[1]);
-    return 0;
+    exit(0);
 }
