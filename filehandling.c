@@ -125,7 +125,6 @@ void ResetPuzzle(Puzzle* Puzzle)
  *****************************************************************************/
 void ReadData(char *filename)
 {
-  int i = 0;
   int l = 0;
   int result = 0;
   FILE* fp = NULL;
@@ -143,16 +142,7 @@ void ReadData(char *filename)
   {
     if(Puzz->size > 0  &&  (Puzz->variant == 1  ||  Puzz->variant == 2))
     {
-      if(Puzz->variant == 1)
-      {
-        printf("%d\n", i);
-        i ++;
-        result = Solve(Puzz);
-      }
-      if(Puzz->variant == 2)
-      {
-
-      }
+      result = Solve(Puzz);
     }
     SolutionWriter(Puzz, filename, result);
     for(l=0; l < Puzz->size; l++)
@@ -218,7 +208,7 @@ void SolutionWriter(Puzzle* Puzz, char *str, int result)
   fprintf(fp, "%d ", Puzz->variant);
   fprintf(fp, "%d\n", result);
 
-  for(i=0; (i < Puzz->size  &&  result != -1); i++)
+  for(i=(Puzz->size - 1); (i >= 0  &&  result != -1); i--)
   {
     for(j=0; j < Puzz->size; j++)
     {

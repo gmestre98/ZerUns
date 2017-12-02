@@ -16,20 +16,38 @@
 #include <time.h>
 #include "Reader.h"
 
-Stack *stack;
+Stack *stack;     /* Pointer to the stack where the changes are saved */
 
-int Solve(Puzzle *Puzz)
+/******************************************************************************
+ * Solve()
+ *
+ * Arguments: Puzzle with the data to read
+ * Returns: 1 if the puzzle is solved, -1 if there is no solution
+ *
+ * Description: Reads the puzzle finding the desired answer
+ *
+ *****************************************************************************/
+ int Solve(Puzzle *Puzz)
 {
   int ret = 0;
   stack = InitStack();
-  ret = Solver1(Puzz, 1, 1, 1, 1);
+  if(Puzz->variant == 1)
+  {
+    ret = Solver1(Puzz, 1, 1, 1, 1);
+  }
+  if(Puzz->variant == 2)
+  {
+    /*ret = Solver2(Puzz, 1, 1, 1, 1);*/
+  }
   return ret;
 }
+
+
 /******************************************************************************
  * Solver()
  *
  * Arguments: Puzzle with the data to read
- * Returns: nothing
+ * Returns: 1 if the puzzle is solved, -1 if there is no solution
  *
  * Description: Reads the puzzle finding the desired answer
  *
@@ -38,52 +56,36 @@ int Solve(Puzzle *Puzz)
  {
     int endstack = 0;
     int ret = 0;
-    int i = 0;
-    int j = 0;
 
-    for(i=0; i < Puzz->size; i++)
-    {
-      for(j=0; j < Puzz->size; j++)
-        printf("%d ", Puzz->matrix[i][j]);
-      printf("\n");
-    }
-    printf("\n");
-
+    /*Filling the obvious cases with the first 2 rules */
     while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
     {
-      l = FillLine(Puzz);     /* Function that verifies if we can fill a line */
-      c = FillCol(Puzz);      /* Function that verifies if we can fill a column */
-      sl = FillSumsLine(Puzz);     /* Function that verifies if we can fill by sumslines */
+      l = FillLine(Puzz);
+      c = FillCol(Puzz);
+      sl = FillSumsLine(Puzz);
       sc = FillSumsCols(Puzz);
     }
     if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
     {
-      endstack = CleanErrors(Puzz);
+      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
       if(endstack == 1)
       {
         return -1;
       }
     }
-    if(FullPuzz(Puzz) == 0)            /* Function that verifies if we completed the puzz */
+    if(FullPuzz(Puzz) == 0)
     {
-      for(i=0; i < Puzz->size; i++)
-      {
-        for(j=0; j < Puzz->size; j++)
-          printf("%d ", Puzz->matrix[i][j]);
-        printf("\n");
-      }
-      printf("\n");
-      FillRandom(Puzz);
+      FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
     }
     if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
     {
-      endstack = CleanErrors(Puzz);
+      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
       if(endstack == 1)
       {
         return -1;
       }
     }
-    else if(FullPuzz(Puzz))            /* Function that verifies if we completed the puzz */
+    else if(FullPuzz(Puzz))
     {
       return 1;
     }
@@ -93,16 +95,15 @@ int Solve(Puzzle *Puzz)
  }
 
 
- /******************************************************************************
-  * InitStack()
-  *
-  * Arguments:
-  * Returns: The stack
-  *
-  * Description: Initializes the Stack used to save the changes in the matrix
-  *
-  *****************************************************************************/
-
+/******************************************************************************
+ * InitStack()
+ *
+ * Arguments:
+ * Returns: The stack
+ *
+ * Description: Initializes the Stack used to save the changes in the matrix
+ *
+ *****************************************************************************/
 Stack *InitStack()
 {
   Stack *stack = malloc(sizeof(Stack));
@@ -123,7 +124,6 @@ Stack *InitStack()
  * Description: Adds the node with the changes aplied to the matrix
  *
  *****************************************************************************/
-
 void Push(char type, int line, int col, int value)
 {
   Changes *changes = malloc(sizeof(changes));
@@ -144,7 +144,6 @@ void Push(char type, int line, int col, int value)
  *
  * Description: Removes the first node of the matrix
  *****************************************************************************/
-
 Changes* Pop()
 {
   Changes *changes = stack->top;
@@ -163,11 +162,10 @@ Changes* Pop()
  * Arguments: The Puzzle
  * Returns: 1 if anything was filled or 0 if not
  *
- * Description: If there are any places to be filled by line conditions they
- *              this function fills them
+ * Description: If there are any places to be filled by line conditions, this
+ *              function fills them
  *
  *****************************************************************************/
-
 int FillLine(Puzzle* Puzz)
 {
   int l = 0;
@@ -214,7 +212,7 @@ int FillLine(Puzzle* Puzz)
 
 
 /******************************************************************************
- * FillLine()
+ * FillCol()
  *
  * Arguments: The Puzzle
  * Returns: 1 if anything was filled or 0 if not
@@ -223,7 +221,6 @@ int FillLine(Puzzle* Puzz)
  *              will be filled
  *
  *****************************************************************************/
-
 int FillCol(Puzzle* Puzz)
 {
   int l = 0;
@@ -275,10 +272,9 @@ int FillCol(Puzzle* Puzz)
  * Arguments: The Puzzle
  * Returns: 1 if anything was filled or 0 if not
  *
- * Description: Adds the node with the changes aplied to the matrix
+ * Description: Fills cases using the parity rule for lines
  *
  *****************************************************************************/
-
 int FillSumsLine(Puzzle* Puzz)
 {
   int l = 0;
@@ -322,16 +318,16 @@ int FillSumsLine(Puzzle* Puzz)
   return ret;
 }
 
+
 /******************************************************************************
  * FillSumsCols()
  *
  * Arguments: The Puzzle
  * Returns: 1 if anything was filled or 0 if not
  *
- * Description: Adds the node with the changes aplied to the matrix
+ * Description:Fills cases using the parity rule for columns
  *
  *****************************************************************************/
-
 int FillSumsCols(Puzzle* Puzz)
 {
   int l = 0;
@@ -385,7 +381,6 @@ int FillSumsCols(Puzzle* Puzz)
  * Description: Verifies if the puzzle is complete
  *
  *****************************************************************************/
-
 int FullPuzz(Puzzle* Puzz)
 {
   int l = 0;
@@ -404,6 +399,16 @@ int FullPuzz(Puzzle* Puzz)
   return 1;
 }
 
+
+/******************************************************************************
+ * WrongPuzz()
+ *
+ * Arguments: The Puzzle
+ * Returns: 1 if any rule is violated, 0 if not
+ *
+ * Description: Verifies if any of the rules was violated
+ *
+ *****************************************************************************/
 int WrongPuzz(Puzzle* Puzz)
 {
   if(WrongLine(Puzz)  ||  WrongCol(Puzz)  ||  WrongSum(Puzz))
@@ -414,6 +419,15 @@ int WrongPuzz(Puzzle* Puzz)
 }
 
 
+/******************************************************************************
+ * WrongLine()
+ *
+ * Arguments: The Puzzle
+ * Returns: 1 if the first rule is violated for any line, 0 if not
+ *
+ * Description: Verifies if the first rule for lines was violated
+ *
+ *****************************************************************************/
 int WrongLine(Puzzle* Puzz)
 {
   int l = 0;
@@ -444,6 +458,15 @@ int WrongLine(Puzzle* Puzz)
 }
 
 
+/******************************************************************************
+ * WrongCol()
+ *
+ * Arguments: The Puzzle
+ * Returns: 1 if the first rule is violated for any column, 0 if not
+ *
+ * Description: Verifies if the first rule for columns was violated
+ *
+ *****************************************************************************/
 int WrongCol(Puzzle *Puzz)
 {
   int l = 0;
@@ -474,6 +497,15 @@ int WrongCol(Puzzle *Puzz)
 }
 
 
+/******************************************************************************
+ * WrongPuzz()
+ *
+ * Arguments: The Puzzle
+ * Returns: 1 if the parity rule was violated, 0 if not
+ *
+ * Description: Verifies if the parity rule was violated
+ *
+ *****************************************************************************/
 int WrongSum(Puzzle *Puzz)
 {
   int l = 0;
@@ -513,6 +545,15 @@ int WrongSum(Puzzle *Puzz)
 }
 
 
+/******************************************************************************
+ * FillRandom()
+ *
+ * Arguments: The Puzzle
+ * Returns: nothing
+ *
+ * Description: Fills a random empty position
+ *
+ *****************************************************************************/
 void FillRandom(Puzzle *Puzz)
 {
   int l = 0;
@@ -528,6 +569,17 @@ void FillRandom(Puzzle *Puzz)
 }
 
 
+/******************************************************************************
+ * CleanErrors()
+ *
+ * Arguments: The Puzzle
+ * Returns: 1 if the puzzle is unsolvable, 0 if the process will continue
+ *
+ * Description: Pops changes from the stack until is found a random filled
+ *              position than changes it to the other binary or if it was
+ *              already tried goes doing pops again
+ *
+ *****************************************************************************/
 int CleanErrors(Puzzle *Puzz)
 {
   int end = 0;

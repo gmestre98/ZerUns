@@ -15,6 +15,7 @@ typedef struct _stack{
   Changes *top;
 }Stack;
 
+int Solve(Puzzle *);
 int Solver1(Puzzle*, int, int, int, int);
 Stack *InitStack();
 int FillLine(Puzzle *);
