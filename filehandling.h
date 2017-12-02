@@ -24,6 +24,6 @@ FILE* OpenFile (char*, char*);
 int GetPuzzle(FILE*, Puzzle*);
 void ResetPuzzle(Puzzle*);
 void ReadData(char *filename);
-void SolutionWriter(Puzzle*, char *);
+void SolutionWriter(Puzzle*, char *, int);
 
 #endif

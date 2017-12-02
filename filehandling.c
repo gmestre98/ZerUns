@@ -55,8 +55,7 @@ int GetPuzzle(FILE *fp, Puzzle *Puzzle)
 	int l = 0;
   int c = 0;
 
-  if ( fscanf ( fp, "%d %d %d %d", &Puzzle->size, &Puzzle->line, &Puzzle->col,
-    &Puzzle->binary ) == 4)
+  if ( fscanf ( fp, "%d %d", &Puzzle->size, &Puzzle->variant ) == 2)
   {
   	Puzzle->matrix = (int**)malloc(sizeof(int*)*(Puzzle->size));
 		if(Puzzle->matrix == NULL)
@@ -108,10 +107,7 @@ int GetPuzzle(FILE *fp, Puzzle *Puzzle)
 void ResetPuzzle(Puzzle* Puzzle)
 {
   Puzzle->size = 0;
-  Puzzle->line = -1;
-  Puzzle->col = -1;
-  Puzzle->binary = -1;
-  Puzzle->result = 0;
+  Puzzle->variant = 0;
   Puzzle->matrix = NULL;
 }
 
@@ -129,7 +125,9 @@ void ResetPuzzle(Puzzle* Puzzle)
  *****************************************************************************/
 void ReadData(char *filename)
 {
+  int i = 0;
   int l = 0;
+  int result = 0;
   FILE* fp = NULL;
 	Puzzle* Puzz = NULL;
 
@@ -143,12 +141,20 @@ void ReadData(char *filename)
   ResetPuzzle(Puzz);
 	while(GetPuzzle(fp, Puzz))
   {
-    if(Puzz->line > 0  &&  Puzz->col > 0  &&  Puzz->line <= Puzz->size  &&
-      Puzz->col <= Puzz->size)
+    if(Puzz->size > 0  &&  (Puzz->variant == 1  ||  Puzz->variant == 2))
     {
-      PuzzlesReading(Puzz);
+      if(Puzz->variant == 1)
+      {
+        printf("%d\n", i);
+        i ++;
+        result = Solve(Puzz);
+      }
+      if(Puzz->variant == 2)
+      {
+
+      }
     }
-    SolutionWriter(Puzz, filename);
+    SolutionWriter(Puzz, filename, result);
     for(l=0; l < Puzz->size; l++)
     {
       free(Puzz->matrix[l]);
@@ -171,12 +177,13 @@ void ReadData(char *filename)
  * Description: Creates a file where the puzzles solutions are written
  *
  *****************************************************************************/
-void SolutionWriter(Puzzle* Puzz, char *str)
+void SolutionWriter(Puzzle* Puzz, char *str, int result)
 {
   FILE *fp = NULL;
   char *filename = NULL;
   char extension[] = ".query";
   int i = 0;
+  int j = 0;
   int indice = 0;
   int len = 0;
 
@@ -208,44 +215,18 @@ void SolutionWriter(Puzzle* Puzz, char *str)
     exit(0);
   }
   fprintf(fp, "%d ", Puzz->size);
-  fprintf(fp, "%d ", Puzz->line);
-  fprintf(fp, "%d ", Puzz->col);
-  fprintf(fp, "%d ", Puzz->binary);
+  fprintf(fp, "%d ", Puzz->variant);
+  fprintf(fp, "%d\n", result);
 
-  if(Puzz->line > 0  &&  Puzz->col > 0  &&  Puzz->line <= Puzz->size  &&
-    Puzz->col <= Puzz->size  &&  (Puzz->binary == 1  ||  Puzz->binary == 0))
+  for(i=0; (i < Puzz->size  &&  result != -1); i++)
   {
-    fprintf(fp, "%d", Puzz->result);
+    for(j=0; j < Puzz->size; j++)
+    {
+      fprintf(fp, "%d ", Puzz->matrix[i][j]);
+    }
+    fprintf(fp, "\n");
   }
   fprintf(fp, "\n\n");
   fclose(fp);
   free(filename);
 }
-
-
-
-
-
-/*
-void PrintShit(PuzzleNode *head)
-{
-  int i, j;
-  while(head != NULL)
-  {
-    printf("%d ", head->content.size);
-    printf("%d ", head->content.line);
-    printf("%d ", head->content.col);
-    printf("%d\n", head->content.binary);
-    for(i=head->content.size - 1 ; i >= 0; i--)
-    {
-      for(j=0; j < head->content.size; j++)
-      {
-        printf("%d", head->content.matrix[i][j]);
-      }
-      printf("\n");
-    }
-    printf("\n%d\n\n\n", head->content.result);
-    head = head->next;
-  }
-}
-*/

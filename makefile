@@ -17,7 +17,7 @@
 CC = gcc
 
 #  Compiler Flags
-CFLAGS = -Wall -ansi -O3
+CFLAGS = -Wall -ansi -g
 
 #  Sources
 SOURCES =  main.c filehandling.c Reader.c

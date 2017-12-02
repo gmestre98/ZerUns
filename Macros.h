@@ -20,11 +20,8 @@
 
 typedef struct Puzzle{
     int size;
-    int line;
-    int col;
-    int binary;
+    int variant;
     int **matrix;
-    int result;
 }Puzzle;
 
 #endif
