@@ -37,7 +37,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
   }
   if(Puzz->variant == 2)
   {
-    /*ret = Solver2(Puzz, 1, 1, 1, 1);*/
+    ret = Solver2(Puzz, 1, 1, 1, 1);
   }
   FreeMaStack();
   return ret;
@@ -56,34 +56,36 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  int Solver1(Puzzle* Puzz, int l, int c, int sl, int sc)
  {
     int endstack = 0;
-    int ret = 0;
 
-    /*Filling the obvious cases with the first 2 rules */
-    while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
+    while(FullPuzz(Puzz) == 0)
     {
-      l = FillLine(Puzz);
-      c = FillCol(Puzz);
-      sl = FillSumsLine(Puzz);
-      sc = FillSumsCols(Puzz);
-    }
-    if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
-    {
-      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
-      if(endstack == 1)
+      /*Filling the obvious cases with the first 2 rules */
+      while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
       {
-        return -1;
+        l = FillLine(Puzz);
+        c = FillCol(Puzz);
+        sl = FillSumsLine(Puzz);
+        sc = FillSumsCols(Puzz);
+      }
+      if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
+      {
+        endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
+        if(endstack == 1)
+        {
+          return -1;
+        }
+      }
+      else if(FullPuzz(Puzz) == 0)
+      {
+        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
+        l = 1;
+      }
+      else
+      {
+        return 1;
       }
     }
-    if(FullPuzz(Puzz) == 0)
-    {
-      FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
-      ret = Solver1(Puzz, 1, 1, 1, 1);
-    }
-    else
-    {
-      return 1;
-    }
-    return ret;
+    return 1;
  }
 
 
@@ -662,3 +664,196 @@ int CleanErrors(Puzzle *Puzz)
     }
     return 0;
 }
+
+
+/******************************************************************************
+ * Solver2()
+ *
+ * Arguments: Puzzle with the data to read
+ * Returns: 1 if the puzzle is solved, -1 if there is no solution
+ *
+ * Description: Reads the puzzle finding the desired answer
+ *
+ *****************************************************************************/
+ int Solver2(Puzzle* Puzz, int l, int c, int sl, int sc)
+ {
+    int endstack = 0;
+
+    while(FullPuzz(Puzz) == 0)
+    {
+      /*Filling the obvious cases with the first 2 rules */
+      while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
+      {
+        l = FillLine(Puzz);
+        c = FillCol(Puzz);
+        sl = FillSumsLine(Puzz);
+        sc = FillSumsCols(Puzz);
+      }
+      if(WrongPuzz2(Puzz))  /* Function that verifies if we created an error */
+      {
+        endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
+        if(endstack == 1)
+        {
+          return -1;
+        }
+      }
+      else if(FullPuzz(Puzz) == 0)
+      {
+        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
+        l = 1;
+      }
+      else
+      {
+        return 1;
+      }
+    }
+    return 1;
+ }
+
+
+ /******************************************************************************
+  * WrongPuzz2()
+  *
+  * Arguments: The Puzzle
+  * Returns: 1 if any rule is violated, 0 if not
+  *
+  * Description: Verifies if any of the rules was violated
+  *
+  *****************************************************************************/
+ int WrongPuzz2(Puzzle* Puzz)
+ {
+   if(WrongLine(Puzz)  ||  WrongCol(Puzz)  ||  WrongSum(Puzz) || EqualLine(Puzz)
+      || EqualCol(Puzz))
+   {
+     return 1;
+   }
+   return 0;
+ }
+
+
+ int EqualLine(Puzzle* Puzz)
+ {
+   int a = 0;
+   int l = 0;
+   int c = 0;
+   int counter = 0;
+   int *lines = NULL;
+   lines = (int *)malloc((Puzz->size) * sizeof(int));
+   if(lines == NULL)
+   {
+     exit(0);
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     lines[l] = 1;
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     for(c = 0; c < Puzz->size; c++)
+     {
+       if(Puzz->matrix[l][c] == 9)
+       {
+         lines[l] = 0;
+         break;
+       }
+     }
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     if(lines[l] == 1)
+     {
+       for(c = l + 1; c < Puzz->size; c++)
+       {
+         if(lines[c] == 1)
+         {
+           for(a = 0; a < Puzz->size; a++)
+           {
+             if(Puzz->matrix[l][a] == Puzz->matrix[c][a])
+             {
+               counter ++;
+             }
+           }
+           if(counter == Puzz->size)
+           {
+             return 1;
+           }
+           counter = 0;
+         }
+       }
+       lines[l] = 0;
+     }
+   }
+   return 0;
+}
+
+
+ int EqualCol(Puzzle* Puzz)
+ {
+   int a = 0;
+   int l = 0;
+   int c = 0;
+   int counter = 0;
+   int *lines = NULL;
+   lines = (int *)malloc((Puzz->size) * sizeof(int));
+   if(lines == NULL)
+   {
+     exit(0);
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     lines[l] = 1;
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     for(c = 0; c < Puzz->size; c++)
+     {
+       if(Puzz->matrix[c][l] == 9)
+       {
+         lines[l] = 0;
+         break;
+       }
+     }
+   }
+   for(l = 0; l < Puzz->size; l++)
+   {
+     if(lines[l] == 1)
+     {
+       for(c = l + 1; c < Puzz->size; c++)
+       {
+         if(lines[c] == 1)
+         {
+           for(a = 0; a < Puzz->size; a++)
+           {
+             if(Puzz->matrix[a][l] == Puzz->matrix[a][c])
+             {
+               counter ++;
+             }
+           }
+           if(counter == Puzz->size)
+           {
+             return 1;
+           }
+           counter = 0;
+         }
+       }
+       lines[l] = 0;
+     }
+   }
+   return 0;
+ }
+
+
+ void printmat(int **mat, int size)
+ {
+   int i, j;
+   for(i=0; i < size; i++)
+   {
+     for(j=0; j < size; j++)
+     {
+       printf("%d ", mat[i][j]);
+     }
+     printf("\n");
+   }
+   printf("\n\n\n");
+   return;
+ }

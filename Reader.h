@@ -34,3 +34,6 @@ int WrongSum(Puzzle *);
 int CleanErrors(Puzzle *);
 int FullPuzz(Puzzle *);
 int Solver2(Puzzle*, int, int, int, int);
+int WrongPuzz2(Puzzle *);
+int EqualLine(Puzzle *);
+int EqualCol(Puzzle *);
