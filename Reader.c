@@ -39,6 +39,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
   {
     /*ret = Solver2(Puzz, 1, 1, 1, 1);*/
   }
+  FreeMaStack();
   return ret;
 }
 
@@ -76,21 +77,12 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
     if(FullPuzz(Puzz) == 0)
     {
       FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
+      ret = Solver1(Puzz, 1, 1, 1, 1);
     }
-    if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
-    {
-      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
-      if(endstack == 1)
-      {
-        return -1;
-      }
-    }
-    else if(FullPuzz(Puzz))
+    else
     {
       return 1;
     }
-    l = c = sl = sc = 1;
-    ret = Solver1(Puzz, l, c, sl, sc);
     return ret;
  }
 
@@ -126,13 +118,19 @@ Stack *InitStack()
  *****************************************************************************/
 void Push(char type, int line, int col, int value)
 {
-  Changes *changes = malloc(sizeof(changes));
+  Changes *changes = NULL;
+  changes = (Changes *)malloc(sizeof(Changes));
+  if(changes == NULL)
+  {
+    exit(0);
+  }
   changes->type = type;
   changes->line = line;
   changes->col = col;
   changes->value = value;
   changes->next = stack->top;
   stack->top = changes;
+  return;
 }
 
 
@@ -153,6 +151,27 @@ Changes* Pop()
     stack->top = stack->top->next;
   }
   return changes;
+}
+
+/******************************************************************************
+ * FreeMaStack()
+ *
+ * Arguments: nothing
+ * Returns: Node popped
+ *
+ * Description: Removes the first node of the matrix
+ *****************************************************************************/
+void FreeMaStack()
+{
+  Changes *freed = NULL;
+  while(stack->top != NULL)
+  {
+    freed = stack->top;
+    stack->top = stack->top->next;
+    free(freed);
+  }
+  free(stack->top);
+  free(stack);
 }
 
 
@@ -181,8 +200,8 @@ int FillLine(Puzzle* Puzz)
             Puzz->matrix[l][c-1] == Puzz->matrix[l][c-2]  &&
             Puzz->matrix[l][c] == 9)
         {
-            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2);
-            return 1;
+          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2);
+          return 1;
         }
       }
       if(c > 0  &&  c < Puzz->size - 1)
@@ -236,7 +255,8 @@ int FillCol(Puzzle* Puzz)
             Puzz->matrix[l-1][c] == Puzz->matrix[l-2][c]  &&
             Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l-1][c] + 1)%2);
+          Puzz->matrix[l][c] = (Puzz->matrix[l-1][c] + 1)%2;
+          Push('r', l, c, Puzz->matrix[l][c]);
           return 1;
         }
       }
@@ -246,7 +266,8 @@ int FillCol(Puzzle* Puzz)
             Puzz->matrix[l-1][c] == Puzz->matrix[l+1][c]  &&
             Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l+1][c] + 1)%2);
+          Puzz->matrix[l][c] = (Puzz->matrix[l+1][c] + 1)%2;
+          Push('r', l, c, Puzz->matrix[l][c]);
           return 1;
         }
       }
@@ -256,7 +277,8 @@ int FillCol(Puzzle* Puzz)
             Puzz->matrix[l+1][c] == Puzz->matrix[l+2][c]  &&
             Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l+2][c] + 1)%2);
+          Puzz->matrix[l][c] = (Puzz->matrix[l+2][c] + 1)%2;
+          Push('r', l, c, Puzz->matrix[l][c]);
           return 1;
         }
       }
@@ -296,7 +318,8 @@ int FillSumsLine(Puzzle* Puzz)
       {
         if(Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = 0);
+          Puzz->matrix[l][c] = 0;
+          Push('r', l, c, 0);
           ret = 1;
         }
       }
@@ -307,7 +330,8 @@ int FillSumsLine(Puzzle* Puzz)
       {
         if(Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = 1);
+          Puzz->matrix[l][c] = 1;
+          Push('r', l, c, 1);
           ret = 1;
         }
       }
@@ -349,7 +373,8 @@ int FillSumsCols(Puzzle* Puzz)
       {
         if(Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = 0);
+          Puzz->matrix[l][c] = 0;
+          Push('r', l, c, 0);
           ret = 1;
         }
       }
@@ -360,7 +385,8 @@ int FillSumsCols(Puzzle* Puzz)
       {
         if(Puzz->matrix[l][c] == 9)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = 1);
+          Puzz->matrix[l][c] = 1;
+          Push('r', l, c, 1);
           ret = 1;
         }
       }
@@ -498,7 +524,7 @@ int WrongCol(Puzzle *Puzz)
 
 
 /******************************************************************************
- * WrongPuzz()
+ * WrongSum()
  *
  * Arguments: The Puzzle
  * Returns: 1 if the parity rule was violated, 0 if not
@@ -546,6 +572,42 @@ int WrongSum(Puzzle *Puzz)
 
 
 /******************************************************************************
+ * FindEmpty()
+ *
+ * Arguments: The Puzzle, a line and a column
+ * Returns: nothing
+ *
+ * Description: Finds an empty position on the puzzle
+ *
+ *****************************************************************************/
+void FindEmpty(Puzzle *Puzz, int *l, int *c)
+{
+  for(*l = 0; *l < Puzz->size; *l = *l + 1)
+  {
+    for(*c = 0; *c < Puzz->size; *c = *c + 1)
+    {
+      if(Puzz->matrix[*l][*c] == 9)
+      {
+        if(*l + 1 < Puzz->size  &&  Puzz->matrix[(*l) + 1][*c] == 9)
+        {
+          *l = *l + 1;
+          return;
+        }
+        else if(*c + 1 < Puzz->size  &&  Puzz->matrix[*l][(*c) + 1] == 9)
+        {
+          *c = *c + 1;
+          return;
+        }
+        else
+        {
+          return;
+        }
+      }
+    }
+  }
+}
+
+/******************************************************************************
  * FillRandom()
  *
  * Arguments: The Puzzle
@@ -558,13 +620,8 @@ void FillRandom(Puzzle *Puzz)
 {
   int l = 0;
   int c = 0;
-  srand(time(NULL));
 
-  do{
-    l = rand() %(Puzz->size);
-    c = rand() %(Puzz->size);
-  }while(Puzz->matrix[l][c] != 9);
-
+  FindEmpty(Puzz, &l, &c);
   Push('a', l, c, Puzz->matrix[l][c] = 0);
 }
 
@@ -582,29 +639,26 @@ void FillRandom(Puzzle *Puzz)
  *****************************************************************************/
 int CleanErrors(Puzzle *Puzz)
 {
-  int end = 0;
   Changes *changes = NULL;
 
-  do{
-    changes = Pop();
-    if(changes != NULL)
+    while(stack->top != NULL)
     {
-      Puzz->matrix[changes->line][changes->col] = 9;
+      if(stack->top->type == 'a' && stack->top->value == 0)
+      {
+        stack->top->value = 1;
+        Puzz->matrix[stack->top->line][stack->top->col] = 1;
+        return 0;
+      }
+      else
+      {
+        changes = Pop();
+        Puzz->matrix[changes->line][changes->col] = 9;
+        free(changes);
+      }
     }
-  }while(changes != NULL  &&  changes->type == 'r');
-
-  if(changes == NULL)
-  {
-    return 1;
-  }
-  else if(changes->value == 0)
-  {
-    Push('a', changes->line, changes->col,
-        Puzz->matrix[changes->line][changes->col] = 1);
-  }
-  else
-  {
-    end = CleanErrors(Puzz);
-  }
-  return end;
+    if(stack->top == NULL)
+    {
+      return 1;
+    }
+    return 0;
 }

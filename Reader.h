@@ -18,10 +18,14 @@ typedef struct _stack{
 int Solve(Puzzle *);
 int Solver1(Puzzle*, int, int, int, int);
 Stack *InitStack();
+void Push(char, int, int, int);
+Changes* Pop();
+void FreeMaStack();
 int FillLine(Puzzle *);
 int FillCol(Puzzle *);
 int FillSumsLine(Puzzle *);
 int FillSumsCols(Puzzle *);
+void FindEmpty(Puzzle *, int *, int *);
 void FillRandom(Puzzle *);
 int WrongPuzz(Puzzle *);
 int WrongLine(Puzzle *);
