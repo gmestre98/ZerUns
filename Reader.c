@@ -545,7 +545,7 @@ int WrongSum(Puzzle *Puzz)
       sumone += (Puzz->matrix[l][c])%9;
       sumzer += (Puzz->matrix[l][c] + 1)%2;
     }
-    if(sumone > Puzz->size  ||  sumzer > Puzz->size)
+    if(sumone > Puzz->size/2  ||  sumzer > Puzz->size/2)
     {
       return 1;
     }
@@ -559,7 +559,7 @@ int WrongSum(Puzzle *Puzz)
       sumone += (Puzz->matrix[l][c])%9;
       sumzer += (Puzz->matrix[l][c] + 1)%2;
     }
-    if(sumone > Puzz->size  ||  sumzer > Puzz->size)
+    if(sumone > Puzz->size/2  ||  sumzer > Puzz->size/2)
     {
       return 1;
     }
