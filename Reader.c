@@ -53,10 +53,10 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  * Description: Reads the puzzle finding the desired answer
  *
  *****************************************************************************/
- int Solver(Puzzle* Puzz, int (*Verification) (Puzzle*))
+ int Solver(Puzzle* Puzz, int (*Verification) (Puzzle *))
  {
-    int endstack = 0;
-    int l = 0, c = 0, sl = 0, sc = 0;
+   int c = 1, l = 1, sc = 1, sl = 1;
+   int endstack = 0;
 
     while(FullPuzz(Puzz) == 0)
     {
@@ -662,51 +662,6 @@ int CleanErrors(Puzzle *Puzz)
     }
     return 0;
 }
-
-
-/******************************************************************************
- * Solver2()
- *
- * Arguments: Puzzle with the data to read
- * Returns: 1 if the puzzle is solved, -1 if there is no solution
- *
- * Description: Reads the puzzle finding the desired answer
- *
- *****************************************************************************/
- int Solver2(Puzzle* Puzz, int l, int c, int sl, int sc)
- {
-    int endstack = 0;
-
-    while(FullPuzz(Puzz) == 0)
-    {
-      /*Filling the obvious cases with the first 2 rules */
-      while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
-      {
-        l = FillLine(Puzz);
-        c = FillCol(Puzz);
-        sl = FillSumsLine(Puzz);
-        sc = FillSumsCols(Puzz);
-      }
-      if(WrongPuzz2(Puzz))  /* Function that verifies if we created an error */
-      {
-        endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
-        if(endstack == 1)
-        {
-          return -1;
-        }
-      }
-      else if(FullPuzz(Puzz) == 0)
-      {
-        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
-        l = 1;
-      }
-      else
-      {
-        return 1;
-      }
-    }
-    return 1;
- }
 
 
  /******************************************************************************

@@ -8,7 +8,7 @@
  *  Macros - Important definitions
  *
  * DESCRIPTION
- *  File containing the important Macros definitions and Typedefs for the project
+ *  File containing the important Macros definitions for the project
  *
  *****************************************************************************/
 
@@ -24,15 +24,4 @@ typedef struct Puzzle{
     int **matrix;
 }Puzzle;
 
-typedef struct _changes{
-  char type;
-  int line;
-  int col;
-  int value;
-  struct _changes *next;
-}Changes;
-
-typedef struct _stack{
-  Changes *top;
-}Stack;
 #endif

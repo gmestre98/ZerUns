@@ -1,11 +1,11 @@
 /******************************************************************************
  *
- * File Name: filehandling.h
+ * File Name: Macros.h
  * Author:    Gonçalo Mestre nº 87005  &  Guilherme Guerreiro nº87010
  * Revision:  26 Oct 2017
  *
  * NAME
- *  filehandling - function definitions
+ *  Macros - Important definitions
  *
  * DESCRIPTION
  *  File containing the declaration of fuctions for the handling of all files
