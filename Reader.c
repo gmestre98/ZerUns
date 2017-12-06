@@ -67,6 +67,11 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
         sl = FillSumsLine(Puzz);
         sc = FillSumsCols(Puzz);
       }
+      if(FullPuzz(Puzz) == 0)
+      {
+        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
+        l = 1;
+      }
       if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
       {
         endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
@@ -74,15 +79,6 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
         {
           return -1;
         }
-      }
-      else if(FullPuzz(Puzz) == 0)
-      {
-        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
-        l = 1;
-      }
-      else
-      {
-        return 1;
       }
     }
     return 1;
@@ -586,24 +582,13 @@ void FindEmpty(Puzzle *Puzz, int *l, int *c)
 {
   for(*l = 0; *l < Puzz->size; *l = *l + 1)
   {
-    for(*c = 0; *c < Puzz->size; *c = *c + 1)
+    for(*c = 0;
+      *c < Puzz->size;
+      *c = *c + 1)
     {
       if(Puzz->matrix[*l][*c] == 9)
       {
-        if(*l + 1 < Puzz->size  &&  Puzz->matrix[(*l) + 1][*c] == 9)
-        {
-          *l = *l + 1;
-          return;
-        }
-        else if(*c + 1 < Puzz->size  &&  Puzz->matrix[*l][(*c) + 1] == 9)
-        {
-          *c = *c + 1;
-          return;
-        }
-        else
-        {
-          return;
-        }
+        return;
       }
     }
   }
@@ -642,11 +627,14 @@ void FillRandom(Puzzle *Puzz)
 int CleanErrors(Puzzle *Puzz)
 {
   Changes *changes = NULL;
+  int endstack = 0;
 
     while(stack->top != NULL)
     {
       if(stack->top->type == 'a' && stack->top->value == 0)
       {
+        /*counter ++;
+        printf("%d\n%d %d\n\n\n", counter, stack->top->line, stack->top->col);*/
         stack->top->value = 1;
         Puzz->matrix[stack->top->line][stack->top->col] = 1;
         return 0;
@@ -657,6 +645,15 @@ int CleanErrors(Puzzle *Puzz)
         Puzz->matrix[changes->line][changes->col] = 9;
         free(changes);
       }
+    }
+    if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
+    {
+      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
+      if(endstack == 1)
+      {
+        return 1;
+      }
+      return 0;
     }
     if(stack->top == NULL)
     {

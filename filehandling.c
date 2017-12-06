@@ -52,11 +52,26 @@ FILE* OpenFile(char *filename, char *mode)
  *****************************************************************************/
 int GetPuzzle(FILE *fp, Puzzle *Puzzle)
 {
+  int a = 0;
 	int l = 0;
   int c = 0;
 
   if ( fscanf ( fp, "%d %d", &Puzzle->size, &Puzzle->variant ) == 2)
   {
+    if(Puzzle->variant != 1  &&  Puzzle->variant != 2)
+    {
+      for(l = 0; l < Puzzle->size; l++)
+      {
+        for(c = 0; c < Puzzle->size; c++)
+        {
+          if(fscanf(fp, "%d", &a) != 1)
+          {
+            CRASH
+          }
+        }
+      }
+      return 1;
+    }
   	Puzzle->matrix = (int**)malloc(sizeof(int*)*(Puzzle->size));
 		if(Puzzle->matrix == NULL)
     {
@@ -145,11 +160,14 @@ void ReadData(char *filename)
       result = Solve(Puzz);
     }
     SolutionWriter(Puzz, filename, result);
-    for(l=0; l < Puzz->size; l++)
+    if(Puzz->variant == 1  ||  Puzz->variant == 2)
     {
-      free(Puzz->matrix[l]);
+      for(l=0; l < Puzz->size; l++)
+      {
+        free(Puzz->matrix[l]);
+      }
+      free(Puzz->matrix);
     }
-    free(Puzz->matrix);
     ResetPuzzle(Puzz);
   }
 	fclose(fp);
@@ -208,15 +226,19 @@ void SolutionWriter(Puzzle* Puzz, char *str, int result)
   fprintf(fp, "%d ", Puzz->variant);
   fprintf(fp, "%d\n", result);
 
-  for(i=(Puzz->size - 1); (i >= 0  &&  result != -1); i--)
+  if(Puzz->variant == 1  ||  Puzz->variant == 2)
   {
-    for(j=0; j < Puzz->size; j++)
+    for(i=(Puzz->size - 1); (i >= 0  &&  result != -1); i--)
     {
-      fprintf(fp, "%d ", Puzz->matrix[i][j]);
+      for(j=0; j < Puzz->size; j++)
+      {
+        fprintf(fp, "%d ", Puzz->matrix[i][j]);
+      }
+      fprintf(fp, "\n");
     }
     fprintf(fp, "\n");
   }
-  fprintf(fp, "\n\n");
+  fprintf(fp, "\n");
   fclose(fp);
   free(filename);
 }
