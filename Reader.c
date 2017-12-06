@@ -33,11 +33,11 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
   stack = InitStack();
   if(Puzz->variant == 1)
   {
-    ret = Solver1(Puzz, 1, 1, 1, 1);
+    ret = Solver(Puzz, WrongPuzz);
   }
   if(Puzz->variant == 2)
   {
-    ret = Solver2(Puzz, 1, 1, 1, 1);
+    ret = Solver(Puzz, WrongPuzz2);
   }
   FreeMaStack();
   return ret;
@@ -53,9 +53,10 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  * Description: Reads the puzzle finding the desired answer
  *
  *****************************************************************************/
- int Solver1(Puzzle* Puzz, int l, int c, int sl, int sc)
+ int Solver(Puzzle* Puzz, int (*Verification) (Puzzle*))
  {
     int endstack = 0;
+    int l = 0, c = 0, sl = 0, sc = 0;
 
     while(FullPuzz(Puzz) == 0)
     {
@@ -72,7 +73,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
         FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
         l = 1;
       }
-      if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
+      if(Verification(Puzz))  /* Function that verifies if we created an error */
       {
         endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
         if(endstack == 1)
