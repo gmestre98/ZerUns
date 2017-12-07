@@ -73,13 +73,10 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
         FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
         l = 1;
       }
-      if(Verification(Puzz))  /* Function that verifies if we created an error */
+      endstack = CleanErrors(Puzz, Verification); /*Correcting the error in the puzzle */
+      if(endstack == 1)
       {
-        endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
-        if(endstack == 1)
-        {
-          return -1;
-        }
+        return -1;
       }
     }
     return 1;
@@ -464,12 +461,12 @@ int WrongLine(Puzzle* Puzz)
   {
     for(c = 0; c < Puzz->size; c++)
     {
-      sumone += (Puzz->matrix[l][c])%9;
-      sumzer += (Puzz->matrix[l][c] + 1)%2;
+      sumone += ((Puzz->matrix[l][c])%9);
+      sumzer += ((Puzz->matrix[l][c] + 1)%2);
       if(c > 2)
       {
-        sumone -= (Puzz->matrix[l][c-3])%9;
-        sumzer -= (Puzz->matrix[l][c-3] + 1)%2;
+        sumone -= ((Puzz->matrix[l][c-3])%9);
+        sumzer -= ((Puzz->matrix[l][c-3] + 1)%2);
       }
       if(sumone > 2 || sumzer > 2)
       {
@@ -503,12 +500,12 @@ int WrongCol(Puzzle *Puzz)
   {
     for(l = 0; l < Puzz->size; l++)
     {
-      sumone += (Puzz->matrix[l][c])%9;
-      sumzer += (Puzz->matrix[l][c] + 1)%2;
+      sumone = sumone + ((Puzz->matrix[l][c])%9);
+      sumzer = sumzer + ((Puzz->matrix[l][c] + 1)%2);
       if(l > 2)
       {
-        sumone -= (Puzz->matrix[l-3][c])%9;
-        sumzer -= (Puzz->matrix[l-3][c] + 1)%2;
+        sumone = sumone - ((Puzz->matrix[l-3][c])%9);
+        sumzer = sumzer - ((Puzz->matrix[l-3][c] + 1)%2);
       }
       if(sumone > 2 || sumzer > 2)
       {
@@ -542,8 +539,8 @@ int WrongSum(Puzzle *Puzz)
   {
     for(c = 0; c < Puzz->size; c++)
     {
-      sumone += (Puzz->matrix[l][c])%9;
-      sumzer += (Puzz->matrix[l][c] + 1)%2;
+      sumone += ((Puzz->matrix[l][c])%9);
+      sumzer += ((Puzz->matrix[l][c] + 1)%2);
     }
     if(sumone > Puzz->size/2  ||  sumzer > Puzz->size/2)
     {
@@ -556,8 +553,8 @@ int WrongSum(Puzzle *Puzz)
   {
     for(l = 0; l < Puzz->size; l++)
     {
-      sumone += (Puzz->matrix[l][c])%9;
-      sumzer += (Puzz->matrix[l][c] + 1)%2;
+      sumone += ((Puzz->matrix[l][c])%9);
+      sumzer += ((Puzz->matrix[l][c] + 1)%2);
     }
     if(sumone > Puzz->size/2  ||  sumzer > Puzz->size/2)
     {
@@ -583,9 +580,7 @@ void FindEmpty(Puzzle *Puzz, int *l, int *c)
 {
   for(*l = 0; *l < Puzz->size; *l = *l + 1)
   {
-    for(*c = 0;
-      *c < Puzz->size;
-      *c = *c + 1)
+    for(*c = 0; *c < Puzz->size; *c = *c + 1)
     {
       if(Puzz->matrix[*l][*c] == 9)
       {
@@ -625,20 +620,19 @@ void FillRandom(Puzzle *Puzz)
  *              already tried goes doing pops again
  *
  *****************************************************************************/
-int CleanErrors(Puzzle *Puzz)
+int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 {
   Changes *changes = NULL;
-  int endstack = 0;
 
+  while(Verification(Puzz))
+  {
     while(stack->top != NULL)
     {
       if(stack->top->type == 'a' && stack->top->value == 0)
       {
-        /*counter ++;
-        printf("%d\n%d %d\n\n\n", counter, stack->top->line, stack->top->col);*/
         stack->top->value = 1;
         Puzz->matrix[stack->top->line][stack->top->col] = 1;
-        return 0;
+        break;
       }
       else
       {
@@ -647,20 +641,12 @@ int CleanErrors(Puzzle *Puzz)
         free(changes);
       }
     }
-    if(WrongPuzz(Puzz))  /* Function that verifies if we created an error */
-    {
-      endstack = CleanErrors(Puzz); /*Correcting the error in the puzzle */
-      if(endstack == 1)
-      {
-        return 1;
-      }
-      return 0;
-    }
-    if(stack->top == NULL)
-    {
-      return 1;
-    }
-    return 0;
+  }
+  if(stack->top == NULL)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 

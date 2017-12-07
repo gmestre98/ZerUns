@@ -31,7 +31,7 @@ int WrongPuzz(Puzzle *);
 int WrongLine(Puzzle *);
 int WrongCol(Puzzle *);
 int WrongSum(Puzzle *);
-int CleanErrors(Puzzle *);
+int CleanErrors(Puzzle *, int (*Verification) (Puzzle *));
 int FullPuzz(Puzzle *);
 int WrongPuzz2(Puzzle *);
 int EqualLine(Puzzle *);
