@@ -57,6 +57,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  {
    int c = 1, l = 1, sc = 1, sl = 1;
    int endstack = 0;
+   int counter = 0;
 
     while(FullPuzz(Puzz) == 0)
     {
@@ -70,14 +71,22 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
       }
       if(FullPuzz(Puzz) == 0)
       {
-        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
-        l = 1;
+        if(counter%2 == 0)
+        {
+          FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
+          l = 1;
+        }
+        else
+        {
+          FillRandom2(Puzz);
+        }
       }
       endstack = CleanErrors(Puzz, Verification); /*Correcting the error in the puzzle */
       if(endstack == 1)
       {
         return -1;
       }
+      counter ++;
     }
     return 1;
  }
@@ -148,6 +157,7 @@ Changes* Pop()
   }
   return changes;
 }
+
 
 /******************************************************************************
  * FreeMaStack()
@@ -578,17 +588,70 @@ int WrongSum(Puzzle *Puzz)
  *****************************************************************************/
 void FindEmpty(Puzzle *Puzz, int *l, int *c)
 {
-  for(*l = 0; *l < Puzz->size; *l = *l + 1)
+  int a = 0;
+  for(a = 0; a < Puzz->size; a++)
   {
-    for(*c = 0; *c < Puzz->size; *c = *c + 1)
+    for(*l = a; *l < Puzz->size; *l = *l + 1)
     {
-      if(Puzz->matrix[*l][*c] == 9)
+      for(*c = a; *c < Puzz->size; *c = *c + 1)
       {
-        return;
+        if(Puzz->matrix[*l][*c] == 9)
+        {
+          return;
+        }
+      }
+    }
+    for(*c = a; *c < Puzz->size; *c = *c + 1)
+    {
+      for(*l = a + 1; *l < Puzz->size; *l = *l + 1)
+      {
+        if(Puzz->matrix[*l][*c] == 9)
+        {
+          return;
+        }
       }
     }
   }
 }
+
+
+/******************************************************************************
+ * FindEmpty2()
+ *
+ * Arguments: The Puzzle, a line and a column
+ * Returns: nothing
+ *
+ * Description: Finds an empty position on the puzzle
+ *
+ *****************************************************************************/
+ void FindEmpty2(Puzzle *Puzz, int *l, int *c)
+{
+  int a = 0;
+  for(a = Puzz->size - 1; a >= 0; a--)
+  {
+    for(*l = a; *l >= 0; *l = *l - 1)
+    {
+      for(*c = a; *c >= 0; *c = *c - 1)
+      {
+        if(Puzz->matrix[*l][*c] == 9)
+        {
+          return;
+        }
+      }
+    }
+    for(*c = a; *c >= 0; *c = *c - 1)
+    {
+      for(*l = a - 1; *l >= 0; *l = *l - 1)
+      {
+        if(Puzz->matrix[*l][*c] == 9)
+        {
+          return;
+        }
+      }
+    }
+  }
+}
+
 
 /******************************************************************************
  * FillRandom()
@@ -608,6 +671,24 @@ void FillRandom(Puzzle *Puzz)
   Push('a', l, c, Puzz->matrix[l][c] = 0);
 }
 
+/******************************************************************************
+ * FillRandom2()
+ *
+ * Arguments: The Puzzle
+ * Returns: nothing
+ *
+ * Description: Fills a random empty position
+ *
+ *****************************************************************************/
+void FillRandom2(Puzzle *Puzz)
+{
+  int l = 0;
+  int c = 0;
+
+  FindEmpty2(Puzz, &l, &c);
+  Push('a', l, c, Puzz->matrix[l][c] = 0);
+}
+
 
 /******************************************************************************
  * CleanErrors()
@@ -624,7 +705,7 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 {
   Changes *changes = NULL;
 
-  while(Verification(Puzz))
+  while(stack->top != NULL  &&  Verification(Puzz))
   {
     while(stack->top != NULL)
     {
@@ -672,9 +753,10 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 
  int EqualLine(Puzzle* Puzz)
  {
-   int a = 0;
-   int l = 0;
-   int c = 0;
+   int a;
+   int l;
+   int c;
+   int f = 0;
    int counter = 0;
    int *lines = NULL;
    lines = (int *)malloc((Puzz->size) * sizeof(int));
@@ -682,21 +764,30 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
    {
      exit(0);
    }
+   /* Initializing the lines vector */
    for(l = 0; l < Puzz->size; l++)
    {
      lines[l] = 1;
    }
+   /* Getting the empty lines */
    for(l = 0; l < Puzz->size; l++)
    {
      for(c = 0; c < Puzz->size; c++)
      {
        if(Puzz->matrix[l][c] == 9)
        {
+         f++;
          lines[l] = 0;
          break;
        }
      }
    }
+   if(f >= Puzz->size - 1)
+   {
+     free(lines);
+     return 0;
+   }
+   /* Finding the errors */
    for(l = 0; l < Puzz->size; l++)
    {
      if(lines[l] == 1)
@@ -711,9 +802,14 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
              {
                counter ++;
              }
+             else
+             {
+               break;
+             }
            }
            if(counter == Puzz->size)
            {
+             free(lines);
              return 1;
            }
            counter = 0;
@@ -722,15 +818,17 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
        lines[l] = 0;
      }
    }
+   free(lines);
    return 0;
 }
 
 
  int EqualCol(Puzzle* Puzz)
  {
-   int a = 0;
-   int l = 0;
-   int c = 0;
+   int a;
+   int l;
+   int c;
+   int f = 0;
    int counter = 0;
    int *lines = NULL;
    lines = (int *)malloc((Puzz->size) * sizeof(int));
@@ -738,21 +836,30 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
    {
      exit(0);
    }
+   /* Initializing the lines vector */
    for(l = 0; l < Puzz->size; l++)
    {
      lines[l] = 1;
    }
+   /* Getting the empty lines */
    for(l = 0; l < Puzz->size; l++)
    {
      for(c = 0; c < Puzz->size; c++)
      {
        if(Puzz->matrix[c][l] == 9)
        {
+         f++;
          lines[l] = 0;
          break;
        }
      }
    }
+   if(f >= Puzz->size - 1)
+   {
+     free(lines);
+     return 0;
+   }
+   /* Finding the errors */
    for(l = 0; l < Puzz->size; l++)
    {
      if(lines[l] == 1)
@@ -767,9 +874,14 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
              {
                counter ++;
              }
+             else
+             {
+               break;
+             }
            }
            if(counter == Puzz->size)
            {
+             free(lines);
              return 1;
            }
            counter = 0;
@@ -778,6 +890,7 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
        lines[l] = 0;
      }
    }
+   free(lines);
    return 0;
  }
 

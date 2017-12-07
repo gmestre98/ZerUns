@@ -36,3 +36,5 @@ int FullPuzz(Puzzle *);
 int WrongPuzz2(Puzzle *);
 int EqualLine(Puzzle *);
 int EqualCol(Puzzle *);
+void FillRandom2(Puzzle *);
+void FindEmpty2(Puzzle *, int *, int *);

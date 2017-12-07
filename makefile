@@ -17,7 +17,7 @@
 CC = gcc
 
 #  Compiler Flags
-CFLAGS = -Wall -ansi -g
+CFLAGS = -Wall -ansi -O3
 
 #  Sources
 SOURCES =  main.c filehandling.c Reader.c
@@ -26,7 +26,7 @@ SOURCES =  main.c filehandling.c Reader.c
 OBJECTS = main.o filehandling.o Reader.o
 
 zeruns: $(OBJECTS)
-	gcc -g -o $@ $(OBJECTS)
+	gcc -o $@ $(OBJECTS)
 
 filehandling.o: filehandling.h filehandling.c
 Reader.o: Reader.h Reader.c
