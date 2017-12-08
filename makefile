@@ -26,7 +26,7 @@ SOURCES =  main.c filehandling.c Reader.c
 OBJECTS = main.o filehandling.o Reader.o
 
 zeruns: $(OBJECTS)
-	gcc -o $@ $(OBJECTS)
+	gcc -g -o $@ $(OBJECTS)
 
 filehandling.o: filehandling.h filehandling.c
 Reader.o: Reader.h Reader.c

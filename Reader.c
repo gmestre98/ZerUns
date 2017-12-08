@@ -55,38 +55,31 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  *****************************************************************************/
  int Solver(Puzzle* Puzz, int (*Verification) (Puzzle *))
  {
-   int c = 1, l = 1, sc = 1, sl = 1;
+   int l = 1;
    int endstack = 0;
-   int counter = 0;
 
     while(FullPuzz(Puzz) == 0)
     {
       /*Filling the obvious cases with the first 2 rules */
-      while(l > 0  ||  c > 0  ||  sl > 0  ||  sc > 0)
+      while(l > 0)
       {
-        l = FillLine(Puzz);
-        c = FillCol(Puzz);
-        sl = FillSumsLine(Puzz);
-        sc = FillSumsCols(Puzz);
+        l = l + FillLine(Puzz);
+        l = l + FillCol(Puzz);
+        l = l + FillSumsLine(Puzz);
+        l = l + FillSumsCols(Puzz);
+        l = 0;
       }
       if(FullPuzz(Puzz) == 0)
       {
-        if(counter%2 == 0)
-        {
-          FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
-          l = 1;
-        }
-        else
-        {
-          FillRandom2(Puzz);
-        }
+        FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
       }
+
       endstack = CleanErrors(Puzz, Verification); /*Correcting the error in the puzzle */
       if(endstack == 1)
       {
         return -1;
       }
-      counter ++;
+      l = 1;
     }
     return 1;
  }
@@ -158,7 +151,6 @@ Changes* Pop()
   return changes;
 }
 
-
 /******************************************************************************
  * FreeMaStack()
  *
@@ -195,44 +187,45 @@ int FillLine(Puzzle* Puzz)
 {
   int l = 0;
   int c = 0;
+  int ret = 0;
 
   for(l = 0; l < Puzz->size; l++)
   {
     for(c = 0; c < Puzz->size; c++)
     {
-      if(c > 1)
+      if(Puzz->matrix[l][c] == 9)
       {
-        if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c-2] != 9  &&
-            Puzz->matrix[l][c-1] == Puzz->matrix[l][c-2]  &&
-            Puzz->matrix[l][c] == 9)
+        if(c > 1)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2);
-          return 1;
+          if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c-2] != 9  &&
+              Puzz->matrix[l][c-1] == Puzz->matrix[l][c-2])
+          {
+            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2);
+            ret = 1;
+          }
         }
-      }
-      if(c > 0  &&  c < Puzz->size - 1)
-      {
-        if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c+1] != 9  &&
-            Puzz->matrix[l][c-1] == Puzz->matrix[l][c+1]  &&
-            Puzz->matrix[l][c] == 9)
+        if(c > 0  &&  c < Puzz->size - 1)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+1] + 1)%2);
-          return 1;
+          if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c+1] != 9  &&
+              Puzz->matrix[l][c-1] == Puzz->matrix[l][c+1])
+          {
+            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+1] + 1)%2);
+            ret = 1;
+          }
         }
-      }
-      if(c < Puzz->size - 2)
-      {
-        if(Puzz->matrix[l][c+1] != 9  &&  Puzz->matrix[l][c+2] != 9  &&
-            Puzz->matrix[l][c+1] == Puzz->matrix[l][c+2]  &&
-            Puzz->matrix[l][c] == 9)
+        if(c < Puzz->size - 2)
         {
-          Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+2] + 1)%2);
-          return 1;
+          if(Puzz->matrix[l][c+1] != 9  &&  Puzz->matrix[l][c+2] != 9  &&
+              Puzz->matrix[l][c+1] == Puzz->matrix[l][c+2])
+          {
+            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+2] + 1)%2);
+            ret = 1;
+          }
         }
       }
     }
   }
-  return 0;
+  return ret;
 }
 
 
@@ -250,47 +243,48 @@ int FillCol(Puzzle* Puzz)
 {
   int l = 0;
   int c = 0;
+  int ret = 0;
 
   for(l = 0; l < Puzz->size; l++)
   {
     for(c = 0; c < Puzz->size; c++)
     {
-      if(l > 1)
+      if(Puzz->matrix[l][c] == 9)
       {
-        if(Puzz->matrix[l-1][c] != 9  &&  Puzz->matrix[l-2][c] != 9  &&
-            Puzz->matrix[l-1][c] == Puzz->matrix[l-2][c]  &&
-            Puzz->matrix[l][c] == 9)
+        if(l > 1)
         {
-          Puzz->matrix[l][c] = (Puzz->matrix[l-1][c] + 1)%2;
-          Push('r', l, c, Puzz->matrix[l][c]);
-          return 1;
+          if(Puzz->matrix[l-1][c] != 9  &&  Puzz->matrix[l-2][c] != 9  &&
+              Puzz->matrix[l-1][c] == Puzz->matrix[l-2][c])
+          {
+            Puzz->matrix[l][c] = (Puzz->matrix[l-1][c] + 1)%2;
+            Push('r', l, c, Puzz->matrix[l][c]);
+            ret = 1;
+          }
         }
-      }
-      if(l > 0  &&  l < Puzz->size - 1)
-      {
-        if(Puzz->matrix[l-1][c] != 9  &&  Puzz->matrix[l+1][c] != 9  &&
-            Puzz->matrix[l-1][c] == Puzz->matrix[l+1][c]  &&
-            Puzz->matrix[l][c] == 9)
+        if(l > 0  &&  l < Puzz->size - 1)
         {
-          Puzz->matrix[l][c] = (Puzz->matrix[l+1][c] + 1)%2;
-          Push('r', l, c, Puzz->matrix[l][c]);
-          return 1;
+          if(Puzz->matrix[l-1][c] != 9  &&  Puzz->matrix[l+1][c] != 9  &&
+              Puzz->matrix[l-1][c] == Puzz->matrix[l+1][c])
+          {
+            Puzz->matrix[l][c] = (Puzz->matrix[l+1][c] + 1)%2;
+            Push('r', l, c, Puzz->matrix[l][c]);
+            ret = 1;
+          }
         }
-      }
-      if(l < Puzz->size - 2)
-      {
-        if(Puzz->matrix[l+1][c] != 9  &&  Puzz->matrix[l+2][c] != 9  &&
-            Puzz->matrix[l+1][c] == Puzz->matrix[l+2][c]  &&
-            Puzz->matrix[l][c] == 9)
+        if(l < Puzz->size - 2)
         {
-          Puzz->matrix[l][c] = (Puzz->matrix[l+2][c] + 1)%2;
-          Push('r', l, c, Puzz->matrix[l][c]);
-          return 1;
+          if(Puzz->matrix[l+1][c] != 9  &&  Puzz->matrix[l+2][c] != 9  &&
+              Puzz->matrix[l+1][c] == Puzz->matrix[l+2][c])
+          {
+            Puzz->matrix[l][c] = (Puzz->matrix[l+2][c] + 1)%2;
+            Push('r', l, c, Puzz->matrix[l][c]);
+            ret = 1;
+          }
         }
       }
     }
   }
-  return 0;
+  return ret;
 }
 
 
@@ -616,44 +610,6 @@ void FindEmpty(Puzzle *Puzz, int *l, int *c)
 
 
 /******************************************************************************
- * FindEmpty2()
- *
- * Arguments: The Puzzle, a line and a column
- * Returns: nothing
- *
- * Description: Finds an empty position on the puzzle
- *
- *****************************************************************************/
- void FindEmpty2(Puzzle *Puzz, int *l, int *c)
-{
-  int a = 0;
-  for(a = Puzz->size - 1; a >= 0; a--)
-  {
-    for(*l = a; *l >= 0; *l = *l - 1)
-    {
-      for(*c = a; *c >= 0; *c = *c - 1)
-      {
-        if(Puzz->matrix[*l][*c] == 9)
-        {
-          return;
-        }
-      }
-    }
-    for(*c = a; *c >= 0; *c = *c - 1)
-    {
-      for(*l = a - 1; *l >= 0; *l = *l - 1)
-      {
-        if(Puzz->matrix[*l][*c] == 9)
-        {
-          return;
-        }
-      }
-    }
-  }
-}
-
-
-/******************************************************************************
  * FillRandom()
  *
  * Arguments: The Puzzle
@@ -668,24 +624,6 @@ void FillRandom(Puzzle *Puzz)
   int c = 0;
 
   FindEmpty(Puzz, &l, &c);
-  Push('a', l, c, Puzz->matrix[l][c] = 0);
-}
-
-/******************************************************************************
- * FillRandom2()
- *
- * Arguments: The Puzzle
- * Returns: nothing
- *
- * Description: Fills a random empty position
- *
- *****************************************************************************/
-void FillRandom2(Puzzle *Puzz)
-{
-  int l = 0;
-  int c = 0;
-
-  FindEmpty2(Puzz, &l, &c);
   Push('a', l, c, Puzz->matrix[l][c] = 0);
 }
 
@@ -705,7 +643,7 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 {
   Changes *changes = NULL;
 
-  while(stack->top != NULL  &&  Verification(Puzz))
+  while(Verification(Puzz))
   {
     while(stack->top != NULL)
     {
@@ -753,9 +691,9 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 
  int EqualLine(Puzzle* Puzz)
  {
-   int a;
-   int l;
-   int c;
+   int a = 0;
+   int l = 0;
+   int c = 0;
    int f = 0;
    int counter = 0;
    int *lines = NULL;
@@ -825,9 +763,9 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 
  int EqualCol(Puzzle* Puzz)
  {
-   int a;
-   int l;
-   int c;
+   int a = 0;
+   int l = 0;
+   int c = 0;
    int f = 0;
    int counter = 0;
    int *lines = NULL;
@@ -892,20 +830,4 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
    }
    free(lines);
    return 0;
- }
-
-
- void printmat(int **mat, int size)
- {
-   int i, j;
-   for(i=0; i < size; i++)
-   {
-     for(j=0; j < size; j++)
-     {
-       printf("%d ", mat[i][j]);
-     }
-     printf("\n");
-   }
-   printf("\n\n\n");
-   return;
  }
