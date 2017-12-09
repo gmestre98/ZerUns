@@ -1,3 +1,5 @@
+#ifndef READER
+#define READER
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -11,20 +13,16 @@ typedef struct _changes{
   struct _changes *next;
 }Changes;
 
-typedef struct _stack{
-  Changes *top;
-}Stack;
+typedef Changes Item;
+
+Changes *ChangeType(char, int, int, int);
 
 int Solve(Puzzle *);
 int Solver(Puzzle*, int (*Verification) (Puzzle *));
-Stack *InitStack();
-void Push(char, int, int, int);
-Changes* Pop();
-void FreeMaStack();
-int FillLine(Puzzle *);
-int FillCol(Puzzle *);
-int FillSumsLine(Puzzle *);
-int FillSumsCols(Puzzle *);
+void FillLine(Puzzle *);
+void FillCol(Puzzle *);
+void FillSumsLine(Puzzle *);
+void FillSumsCols(Puzzle *);
 void FindEmpty(Puzzle *, int *, int *);
 void FillRandom(Puzzle *);
 int WrongPuzz(Puzzle *);
@@ -38,3 +36,4 @@ int EqualLine(Puzzle *);
 int EqualCol(Puzzle *);
 void FillRandom2(Puzzle *);
 void FindEmpty2(Puzzle *, int *, int *);
+#endif

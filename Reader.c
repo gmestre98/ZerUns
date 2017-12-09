@@ -15,8 +15,8 @@
 #include <stdio.h>
 #include <time.h>
 #include "Reader.h"
+#include "stack.h"
 
-Stack *stack;     /* Pointer to the stack where the changes are saved */
 
 /******************************************************************************
  * Solve()
@@ -30,7 +30,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  int Solve(Puzzle *Puzz)
 {
   int ret = 0;
-  stack = InitStack();
+  InitStack();
   if(Puzz->variant == 1)
   {
     ret = Solver(Puzz, WrongPuzz);
@@ -39,7 +39,7 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
   {
     ret = Solver(Puzz, WrongPuzz2);
   }
-  FreeMaStack();
+  FreeStack();
   return ret;
 }
 
@@ -55,20 +55,15 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
  *****************************************************************************/
  int Solver(Puzzle* Puzz, int (*Verification) (Puzzle *))
  {
-   int l = 1;
    int endstack = 0;
 
     while(FullPuzz(Puzz) == 0)
     {
       /*Filling the obvious cases with the first 2 rules */
-      while(l > 0)
-      {
-        l = l + FillLine(Puzz);
-        l = l + FillCol(Puzz);
-        l = l + FillSumsLine(Puzz);
-        l = l + FillSumsCols(Puzz);
-        l = 0;
-      }
+    	FillLine(Puzz);
+      FillCol(Puzz);
+      FillSumsLine(Puzz);
+			FillSumsCols(Puzz);
       if(FullPuzz(Puzz) == 0)
       {
         FillRandom(Puzz);     /*If the puzzle is not full we fill a random pos */
@@ -79,97 +74,25 @@ Stack *stack;     /* Pointer to the stack where the changes are saved */
       {
         return -1;
       }
-      l = 1;
     }
     return 1;
  }
 
 
-/******************************************************************************
- * InitStack()
- *
- * Arguments:
- * Returns: The stack
- *
- * Description: Initializes the Stack used to save the changes in the matrix
- *
- *****************************************************************************/
-Stack *InitStack()
+Changes *ChangeType(char type, int l, int c, int value)
 {
-  Stack *stack = malloc(sizeof(Stack));
-  stack->top = NULL;
-  return stack;
-}
-
-
-/******************************************************************************
- * Push()
- *
- * Arguments: type of the change to the matrix
- *            line of the change to the matrix
- *            column of the change to the matrix
- *            value introduced in the matrix
- * Returns: nothing
- *
- * Description: Adds the node with the changes aplied to the matrix
- *
- *****************************************************************************/
-void Push(char type, int line, int col, int value)
-{
-  Changes *changes = NULL;
-  changes = (Changes *)malloc(sizeof(Changes));
+	Changes *changes = NULL;
+	changes = (Changes *)malloc(sizeof(Changes));
   if(changes == NULL)
   {
-    exit(0);
-  }
+  	exit(0);
+ 	}
   changes->type = type;
-  changes->line = line;
-  changes->col = col;
+ 	changes->line = l;
+  changes->col = c;
   changes->value = value;
-  changes->next = stack->top;
-  stack->top = changes;
-  return;
-}
-
-
-/******************************************************************************
- * Pop()
- *
- * Arguments: nothing
- * Returns: Node popped
- *
- * Description: Removes the first node of the matrix
- *****************************************************************************/
-Changes* Pop()
-{
-  Changes *changes = stack->top;
-
-  if(stack->top != NULL)
-  {
-    stack->top = stack->top->next;
-  }
+  changes->next = NULL;
   return changes;
-}
-
-/******************************************************************************
- * FreeMaStack()
- *
- * Arguments: nothing
- * Returns: Node popped
- *
- * Description: Removes the first node of the matrix
- *****************************************************************************/
-void FreeMaStack()
-{
-  Changes *freed = NULL;
-  while(stack->top != NULL)
-  {
-    freed = stack->top;
-    stack->top = stack->top->next;
-    free(freed);
-  }
-  free(stack->top);
-  free(stack);
 }
 
 
@@ -183,11 +106,10 @@ void FreeMaStack()
  *              function fills them
  *
  *****************************************************************************/
-int FillLine(Puzzle* Puzz)
+void FillLine(Puzzle* Puzz)
 {
-  int l = 0;
-  int c = 0;
-  int ret = 0;
+  int l;
+  int c;
 
   for(l = 0; l < Puzz->size; l++)
   {
@@ -200,8 +122,8 @@ int FillLine(Puzzle* Puzz)
           if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c-2] != 9  &&
               Puzz->matrix[l][c-1] == Puzz->matrix[l][c-2])
           {
-            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2);
-            ret = 1;
+            Puzz->matrix[l][c] = (Puzz->matrix[l][c-1] + 1)%2;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
           }
         }
         if(c > 0  &&  c < Puzz->size - 1)
@@ -209,8 +131,8 @@ int FillLine(Puzzle* Puzz)
           if(Puzz->matrix[l][c-1] != 9  &&  Puzz->matrix[l][c+1] != 9  &&
               Puzz->matrix[l][c-1] == Puzz->matrix[l][c+1])
           {
-            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+1] + 1)%2);
-            ret = 1;
+            Puzz->matrix[l][c] = (Puzz->matrix[l][c+1] + 1)%2;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
           }
         }
         if(c < Puzz->size - 2)
@@ -218,14 +140,13 @@ int FillLine(Puzzle* Puzz)
           if(Puzz->matrix[l][c+1] != 9  &&  Puzz->matrix[l][c+2] != 9  &&
               Puzz->matrix[l][c+1] == Puzz->matrix[l][c+2])
           {
-            Push('r', l, c, Puzz->matrix[l][c] = (Puzz->matrix[l][c+2] + 1)%2);
-            ret = 1;
+            Puzz->matrix[l][c] = (Puzz->matrix[l][c+2] + 1)%2;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
           }
         }
       }
     }
   }
-  return ret;
 }
 
 
@@ -239,11 +160,10 @@ int FillLine(Puzzle* Puzz)
  *              will be filled
  *
  *****************************************************************************/
-int FillCol(Puzzle* Puzz)
+void FillCol(Puzzle* Puzz)
 {
-  int l = 0;
-  int c = 0;
-  int ret = 0;
+  int l;
+  int c;
 
   for(l = 0; l < Puzz->size; l++)
   {
@@ -257,8 +177,8 @@ int FillCol(Puzzle* Puzz)
               Puzz->matrix[l-1][c] == Puzz->matrix[l-2][c])
           {
             Puzz->matrix[l][c] = (Puzz->matrix[l-1][c] + 1)%2;
-            Push('r', l, c, Puzz->matrix[l][c]);
-            ret = 1;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
+            
           }
         }
         if(l > 0  &&  l < Puzz->size - 1)
@@ -267,8 +187,7 @@ int FillCol(Puzzle* Puzz)
               Puzz->matrix[l-1][c] == Puzz->matrix[l+1][c])
           {
             Puzz->matrix[l][c] = (Puzz->matrix[l+1][c] + 1)%2;
-            Push('r', l, c, Puzz->matrix[l][c]);
-            ret = 1;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
           }
         }
         if(l < Puzz->size - 2)
@@ -277,14 +196,12 @@ int FillCol(Puzzle* Puzz)
               Puzz->matrix[l+1][c] == Puzz->matrix[l+2][c])
           {
             Puzz->matrix[l][c] = (Puzz->matrix[l+2][c] + 1)%2;
-            Push('r', l, c, Puzz->matrix[l][c]);
-            ret = 1;
+            Push(ChangeType('r', l, c, Puzz->matrix[l][c]));
           }
         }
       }
     }
   }
-  return ret;
 }
 
 
@@ -297,13 +214,12 @@ int FillCol(Puzzle* Puzz)
  * Description: Fills cases using the parity rule for lines
  *
  *****************************************************************************/
-int FillSumsLine(Puzzle* Puzz)
+void FillSumsLine(Puzzle* Puzz)
 {
-  int l = 0;
-  int c = 0;
+  int l;
+  int c;
   int sumline = 0;
   int sumlinezer = 0;
-  int ret = 0;
 
   for(l = 0; l < Puzz->size; l++)
   {
@@ -319,8 +235,7 @@ int FillSumsLine(Puzzle* Puzz)
         if(Puzz->matrix[l][c] == 9)
         {
           Puzz->matrix[l][c] = 0;
-          Push('r', l, c, 0);
-          ret = 1;
+          Push(ChangeType('r', l, c, 0));
         }
       }
     }
@@ -331,15 +246,13 @@ int FillSumsLine(Puzzle* Puzz)
         if(Puzz->matrix[l][c] == 9)
         {
           Puzz->matrix[l][c] = 1;
-          Push('r', l, c, 1);
-          ret = 1;
+          Push(ChangeType('r', l, c, 1));
         }
       }
     }
     sumline = 0;
     sumlinezer = 0;
   }
-  return ret;
 }
 
 
@@ -352,13 +265,12 @@ int FillSumsLine(Puzzle* Puzz)
  * Description:Fills cases using the parity rule for columns
  *
  *****************************************************************************/
-int FillSumsCols(Puzzle* Puzz)
+void FillSumsCols(Puzzle* Puzz)
 {
-  int l = 0;
-  int c = 0;
+  int l;
+  int c;
   int sumline = 0;
   int sumlinezer = 0;
-  int ret = 0;
 
   for(c = 0; c < Puzz->size; c++)
   {
@@ -374,8 +286,7 @@ int FillSumsCols(Puzzle* Puzz)
         if(Puzz->matrix[l][c] == 9)
         {
           Puzz->matrix[l][c] = 0;
-          Push('r', l, c, 0);
-          ret = 1;
+          Push(ChangeType('r', l, c, 0));
         }
       }
     }
@@ -386,15 +297,13 @@ int FillSumsCols(Puzzle* Puzz)
         if(Puzz->matrix[l][c] == 9)
         {
           Puzz->matrix[l][c] = 1;
-          Push('r', l, c, 1);
-          ret = 1;
+          Push(ChangeType('r', l, c, 1));
         }
       }
     }
     sumline = 0;
     sumlinezer = 0;
   }
-  return ret;
 }
 
 
@@ -624,7 +533,7 @@ void FillRandom(Puzzle *Puzz)
   int c = 0;
 
   FindEmpty(Puzz, &l, &c);
-  Push('a', l, c, Puzz->matrix[l][c] = 0);
+  Push(ChangeType('a', l, c, Puzz->matrix[l][c] = 0));
 }
 
 
@@ -645,23 +554,24 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
 
   while(Verification(Puzz))
   {
-    while(stack->top != NULL)
+    while(isEmpty() == 0)
     {
-      if(stack->top->type == 'a' && stack->top->value == 0)
+    	changes = Pop();
+      if(changes->type == 'a' && changes->value == 0)
       {
-        stack->top->value = 1;
-        Puzz->matrix[stack->top->line][stack->top->col] = 1;
+        changes->value = 1;
+        Puzz->matrix[changes->line][changes->col] = 1;
+        Push(changes);
         break;
       }
       else
       {
-        changes = Pop();
         Puzz->matrix[changes->line][changes->col] = 9;
         free(changes);
       }
     }
   }
-  if(stack->top == NULL)
+  if(isEmpty() == 1)
   {
     return 1;
   }
@@ -678,156 +588,156 @@ int CleanErrors(Puzzle *Puzz, int (*Verification) (Puzzle *))
   * Description: Verifies if any of the rules was violated
   *
   *****************************************************************************/
- int WrongPuzz2(Puzzle* Puzz)
- {
-   if(WrongLine(Puzz)  ||  WrongCol(Puzz)  ||  WrongSum(Puzz) || EqualLine(Puzz)
-      || EqualCol(Puzz))
-   {
-     return 1;
-   }
-   return 0;
- }
-
-
- int EqualLine(Puzzle* Puzz)
- {
-   int a = 0;
-   int l = 0;
-   int c = 0;
-   int f = 0;
-   int counter = 0;
-   int *lines = NULL;
-   lines = (int *)malloc((Puzz->size) * sizeof(int));
-   if(lines == NULL)
-   {
-     exit(0);
-   }
-   /* Initializing the lines vector */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     lines[l] = 1;
-   }
-   /* Getting the empty lines */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     for(c = 0; c < Puzz->size; c++)
-     {
-       if(Puzz->matrix[l][c] == 9)
-       {
-         f++;
-         lines[l] = 0;
-         break;
-       }
-     }
-   }
-   if(f >= Puzz->size - 1)
-   {
-     free(lines);
-     return 0;
-   }
-   /* Finding the errors */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     if(lines[l] == 1)
-     {
-       for(c = l + 1; c < Puzz->size; c++)
-       {
-         if(lines[c] == 1)
-         {
-           for(a = 0; a < Puzz->size; a++)
-           {
-             if(Puzz->matrix[l][a] == Puzz->matrix[c][a])
-             {
-               counter ++;
-             }
-             else
-             {
-               break;
-             }
-           }
-           if(counter == Puzz->size)
-           {
-             free(lines);
-             return 1;
-           }
-           counter = 0;
-         }
-       }
-       lines[l] = 0;
-     }
-   }
-   free(lines);
-   return 0;
+int WrongPuzz2(Puzzle* Puzz)
+{
+  if(WrongLine(Puzz)  ||  WrongCol(Puzz)  ||  WrongSum(Puzz) || EqualLine(Puzz)
+	  || EqualCol(Puzz))
+  {
+    return 1;
+  }
+  	return 0;
 }
 
 
- int EqualCol(Puzzle* Puzz)
- {
-   int a = 0;
-   int l = 0;
-   int c = 0;
-   int f = 0;
-   int counter = 0;
-   int *lines = NULL;
-   lines = (int *)malloc((Puzz->size) * sizeof(int));
-   if(lines == NULL)
-   {
-     exit(0);
-   }
-   /* Initializing the lines vector */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     lines[l] = 1;
-   }
-   /* Getting the empty lines */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     for(c = 0; c < Puzz->size; c++)
-     {
-       if(Puzz->matrix[c][l] == 9)
-       {
-         f++;
-         lines[l] = 0;
-         break;
-       }
-     }
-   }
-   if(f >= Puzz->size - 1)
-   {
-     free(lines);
-     return 0;
-   }
-   /* Finding the errors */
-   for(l = 0; l < Puzz->size; l++)
-   {
-     if(lines[l] == 1)
-     {
-       for(c = l + 1; c < Puzz->size; c++)
-       {
-         if(lines[c] == 1)
-         {
-           for(a = 0; a < Puzz->size; a++)
-           {
-             if(Puzz->matrix[a][l] == Puzz->matrix[a][c])
-             {
-               counter ++;
-             }
-             else
-             {
-               break;
-             }
-           }
-           if(counter == Puzz->size)
-           {
-             free(lines);
-             return 1;
-           }
-           counter = 0;
-         }
-       }
-       lines[l] = 0;
-     }
-   }
-   free(lines);
-   return 0;
- }
+int EqualLine(Puzzle* Puzz)
+{
+	int a = 0;
+  int l = 0;
+  int c = 0;
+  int f = 0;
+  int counter = 0;
+  int *lines = NULL;
+  lines = (int *)malloc((Puzz->size) * sizeof(int));
+  if(lines == NULL)
+  {
+    exit(0);
+  }
+  /* Initializing the lines vector */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    lines[l] = 1;
+  }
+  /* Getting the empty lines */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    for(c = 0; c < Puzz->size; c++)
+    {
+      if(Puzz->matrix[l][c] == 9)
+      {
+        f++;
+        lines[l] = 0;
+        break;
+      }
+    }
+  }
+  if(f >= Puzz->size - 1)
+  {
+    free(lines);
+    return 0;
+  }
+  /* Finding the errors */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    if(lines[l] == 1)
+    {
+      for(c = l + 1; c < Puzz->size; c++)
+      {
+        if(lines[c] == 1)
+        {
+          for(a = 0; a < Puzz->size; a++)
+          {
+            if(Puzz->matrix[l][a] == Puzz->matrix[c][a])
+            {
+              counter ++;
+            }
+            else
+            {
+              break;
+            }
+          }
+          if(counter == Puzz->size)
+          {
+            free(lines);
+            return 1;
+          }
+          counter = 0;
+        }
+      }
+      lines[l] = 0;
+    }
+  }
+  free(lines);
+  return 0;
+}
+
+
+int EqualCol(Puzzle* Puzz)
+{
+  int a = 0;
+  int l = 0;
+  int c = 0;
+  int f = 0;
+  int counter = 0;
+  int *lines = NULL;
+  lines = (int *)malloc((Puzz->size) * sizeof(int));
+  if(lines == NULL)
+  {
+    exit(0);
+  }
+  /* Initializing the lines vector */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    lines[l] = 1;
+  }
+  /* Getting the empty lines */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    for(c = 0; c < Puzz->size; c++)
+    {
+      if(Puzz->matrix[c][l] == 9)
+      {
+        f++;
+        lines[l] = 0;
+        break;
+      }
+    }
+  }
+  if(f >= Puzz->size - 1)
+  {
+    free(lines);
+    return 0;
+  }
+  /* Finding the errors */
+  for(l = 0; l < Puzz->size; l++)
+  {
+    if(lines[l] == 1)
+    {
+      for(c = l + 1; c < Puzz->size; c++)
+      {
+        if(lines[c] == 1)
+        {
+          for(a = 0; a < Puzz->size; a++)
+          {
+            if(Puzz->matrix[a][l] == Puzz->matrix[a][c])
+            {
+              counter ++;
+            }
+            else
+            {
+              break;
+            }
+          }
+          if(counter == Puzz->size)
+          {
+            free(lines);
+            return 1;
+          }
+          counter = 0;
+        }
+      }
+      lines[l] = 0;
+    }
+  }
+  free(lines);
+  return 0;
+}

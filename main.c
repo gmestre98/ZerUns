@@ -18,7 +18,6 @@
 #include "filehandling.h"
 #include "Macros.h"
 
-
 int main(int argc, char *argv[])
 {
     char *token = NULL;
@@ -38,6 +37,7 @@ int main(int argc, char *argv[])
     {
         CRASH
     }
+
     ReadData(argv[1]);
     exit(0);
 }

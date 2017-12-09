@@ -20,16 +20,18 @@ CC = gcc
 CFLAGS = -Wall -ansi -O3
 
 #  Sources
-SOURCES =  main.c filehandling.c Reader.c
+SOURCES =  main.c filehandling.c Reader.c stack.c
 
 #  Objects
-OBJECTS = main.o filehandling.o Reader.o
+OBJECTS = main.o filehandling.o Reader.o stack.o
 
 zeruns: $(OBJECTS)
 	gcc -g -o $@ $(OBJECTS)
 
 filehandling.o: filehandling.h filehandling.c
 Reader.o: Reader.h Reader.c
+stack.o: stack.h stack.c
+
 
 clean::
 	rm -f *.o core a.out zeruns *~
