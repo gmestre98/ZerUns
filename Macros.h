@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define CRASH exit(0);
+#define ZERO return 0;
+#define ONE return 1;
 
 typedef struct Puzzle{
     int size;

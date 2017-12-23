@@ -1,11 +1,11 @@
 /******************************************************************************
  *
- * File Name: Macros.h
+ * File Name: filehandling.c
  * Author:    Gonçalo Mestre nº 87005  &  Guilherme Guerreiro nº87010
  * Revision:  26 Oct 2017
  *
  * NAME
- *  Macros - Important definitions
+ *  filehandling
  *
  * DESCRIPTION
  *  File containing the handling of all files
@@ -31,8 +31,7 @@ FILE* OpenFile(char *filename, char *mode)
 {
   FILE *f = NULL;
   f = fopen (filename, mode);
-  if ( f == NULL )
-  {
+  if ( f == NULL ){
   	CRASH
   }
   return (f);
@@ -56,57 +55,44 @@ int GetPuzzle(FILE *fp, Puzzle *Puzzle)
 	int l = 0;
   int c = 0;
 
-  if ( fscanf ( fp, "%d %d", &Puzzle->size, &Puzzle->variant ) == 2)
-  {
+  if ( fscanf ( fp, "%d %d", &Puzzle->size, &Puzzle->variant ) == 2){
     if(Puzzle->size <= 0 && Puzzle->size%2 != 0 && Puzzle->variant != 1  &&
-       Puzzle->variant != 2)
-    {
-      for(l = 0; l < Puzzle->size; l++)
-      {
-        for(c = 0; c < Puzzle->size; c++)
-        {
-          if(fscanf(fp, "%d", &a) != 1)
-          {
+       Puzzle->variant != 2){
+      for(l = 0; l < Puzzle->size; l++){
+        for(c = 0; c < Puzzle->size; c++){
+          if(fscanf(fp, "%d", &a) != 1){
             CRASH
           }
         }
       }
-      return 1;
+      ONE
     }
   	Puzzle->matrix = (int**)malloc(sizeof(int*)*(Puzzle->size));
-		if(Puzzle->matrix == NULL)
-    {
+		if(Puzzle->matrix == NULL){
       CRASH
     }
-  	for(l=0; l < Puzzle->size; l++)
-  	{
+  	for(l=0; l < Puzzle->size; l++){
   		Puzzle->matrix[l] = (int*)malloc(sizeof(int)*Puzzle->size);
-  		if(Puzzle->matrix[l]==NULL)
-      {
+  		if(Puzzle->matrix[l]==NULL){
         CRASH
       }
   	}
   }
-  else if(feof(fp))
-  {
+  else if(feof(fp)){
     free(Puzzle);
-  	return 0;
+  	ZERO
   }
-  else
-  {
+  else{
     CRASH
   }
-	for(l = (Puzzle->size-1); l >=0; l--)
-	{
-		for(c = 0; c < Puzzle->size; c++)
-		{
-			if(fscanf(fp, "%d", &Puzzle->matrix[l][c])!=1)
-      {
+	for(l = (Puzzle->size-1); l >=0; l--){
+		for(c = 0; c < Puzzle->size; c++){
+			if(fscanf(fp, "%d", &Puzzle->matrix[l][c])!=1){
         CRASH
       }
 		}
 	}
-	return 1;
+	ONE
 }
 
 
@@ -147,26 +133,21 @@ void ReadData(char *filename)
 	Puzzle* Puzz = NULL;
 
   Puzz = (Puzzle*)malloc(sizeof(Puzzle));
-  if(Puzz == NULL)
-  {
+  if(Puzz == NULL){
     CRASH
   }
 
 	fp = OpenFile(filename, "r");
   ResetPuzzle(Puzz);
-	while(GetPuzzle(fp, Puzz))
-  {
+	while(GetPuzzle(fp, Puzz)){
     if(Puzz->size > 0  &&  Puzz->size%2 == 0 &&
-      (Puzz->variant == 1  ||  Puzz->variant == 2))
-    {
+      (Puzz->variant == 1  ||  Puzz->variant == 2)){
       result = Solve(Puzz);
     }
     SolutionWriter(Puzz, filename, result);
     if(Puzz->size > 0 && Puzz->size%2 == 0 &&
-      (Puzz->variant == 1  ||  Puzz->variant == 2))
-    {
-      for(l=0; l < Puzz->size; l++)
-      {
+      (Puzz->variant == 1  ||  Puzz->variant == 2)){
+      for(l=0; l < Puzz->size; l++){
         free(Puzz->matrix[l]);
       }
       free(Puzz->matrix);
@@ -199,44 +180,34 @@ void SolutionWriter(Puzzle* Puzz, char *str, int result)
   int len = 0;
 
   len = strlen(extension);
-  for(i=0; str[i] != '\0'; i++)
-  {
-    if(str[i] == '.')
-    {
+  for(i=0; str[i] != '\0'; i++){
+    if(str[i] == '.'){
       indice = i;
     }
   }
   filename = (char*)malloc((indice+len+1)*sizeof(char));
-  if(filename == NULL)
-  {
-    exit(0);
+  if(filename == NULL){
+    CRASH
   }
-  for(i=0; i < indice; i++)
-  {
+  for(i=0; i < indice; i++){
     filename[i] = str[i];
   }
-  for(i=indice; i <= indice+len; i++)
-  {
+  for(i=indice; i <= indice+len; i++){
     filename[i] = extension[i-indice];
   }
   fp = OpenFile(filename, "a");
-  if(fp == NULL)
-  {
+  if(fp == NULL){
   	free(filename);
-    exit(0);
+    CRASH
   }
   fprintf(fp, "%d ", Puzz->size);
   fprintf(fp, "%d ", Puzz->variant);
 
   if(Puzz->size > 0 && Puzz->size%2 == 0 &&
-    (Puzz->variant == 1  ||  Puzz->variant == 2))
-  {
-
+    (Puzz->variant == 1  ||  Puzz->variant == 2)){
     fprintf(fp, "%d\n", result);
-    for(i=(Puzz->size - 1); (i >= 0  &&  result != -1); i--)
-    {
-      for(j=0; j < Puzz->size; j++)
-      {
+    for(i=(Puzz->size - 1); (i >= 0  &&  result != -1); i--){
+      for(j=0; j < Puzz->size; j++){
         fprintf(fp, "%d ", Puzz->matrix[i][j]);
       }
       fprintf(fp, "\n");
